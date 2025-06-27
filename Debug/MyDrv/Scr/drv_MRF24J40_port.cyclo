@@ -1,0 +1,8 @@
+../MyDrv/Scr/drv_MRF24J40_port.c:22:6:InicializoPines	1
+../MyDrv/Scr/drv_MRF24J40_port.c:35:6:SetCSPin	1
+../MyDrv/Scr/drv_MRF24J40_port.c:46:6:SetWakePin	1
+../MyDrv/Scr/drv_MRF24J40_port.c:57:6:SetResetPin	1
+../MyDrv/Scr/drv_MRF24J40_port.c:67:17:IsMRF24Interrup	1
+../MyDrv/Scr/drv_MRF24J40_port.c:77:6:WriteByteSPIPort	1
+../MyDrv/Scr/drv_MRF24J40_port.c:88:6:Write2ByteSPIPort	1
+../MyDrv/Scr/drv_MRF24J40_port.c:102:9:ReadByteSPIPort	1
