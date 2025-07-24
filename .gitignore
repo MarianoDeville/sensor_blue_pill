@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+Debug/App/Scr/app_leds.cyclo
+Debug/App/Scr/app_principal.cyclo
+Debug/MyDrv/Scr/drv_MRF24J40.cyclo
+Debug/sensor_blue_pill.list
+/Debug

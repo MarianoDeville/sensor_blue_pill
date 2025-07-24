@@ -71,11 +71,14 @@ MRF24_State_t MRF24J40Init(void);
 MRF24_State_t MRF24SetMensajeSalida(const char * mensaje);
 MRF24_State_t MRF24SetDireccionDestino(uint16_t direccion);
 MRF24_State_t MRF24SetPANIDDestino(uint16_t panid);
+MRF24_State_t MRF24SetDireccionOrigen(uint16_t direccion);
 MRF24_State_t MRF24TransmitirDato(void);
 volatile MRF24_State_t MRF24IsNewMsg(void);
 MRF24_State_t MRF24ReciboPaquete(void);
 unsigned char * MRF24GetMensajeEntrada(void);
 uint16_t MRF24GetMiPANID(void);
+uint16_t MRF24GetMyAddr(void);
+
 
 MRF24_State_t MRF24BuscarDispositivos(void);
 MRF24_State_t MRF24TransmitirDatoEncriptado(void);

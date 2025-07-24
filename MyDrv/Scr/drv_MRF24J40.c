@@ -79,6 +79,7 @@ static struct {	bool_t get_new_msg;
 /* Estructura con la información de transmisión */
 static struct {	uint16_t destinity_panid;
 				uint16_t destinity_address;
+				uint16_t origin_address;
 				uint8_t largo_mensaje;
 				const char * buffer;
 }data_out_s;
@@ -124,6 +125,7 @@ static void InicializoVariables(void) {
 	data_in_s.buffer[0] = VACIO;
 	data_out_s.destinity_panid = VACIO;
 	data_out_s.destinity_address = VACIO;
+	data_out_s.origin_address = VACIO;
 	data_out_s.largo_mensaje = VACIO;
 	data_out_s.buffer = NULL;
 	return;
@@ -358,6 +360,19 @@ MRF24_State_t MRF24SetPANIDDestino(uint16_t panid) {
 }
 
 /**
+ * @brief   Configuro la dirección corta del dispositivo del que salió el mensaje.
+ * @param   Dirección corta del dispositivo - 2 bytes.
+ * @retval  Estado de la operación (OPERACION_NO_REALIZADA, OPERACION_REALIZADA).
+ */
+MRF24_State_t MRF24SetDireccionOrigen(uint16_t direccion) {
+
+	if(estadoActual != INICIALIZACION_OK)
+		return OPERACION_NO_REALIZADA;
+	data_out_s.origin_address = direccion;
+	return OPERACION_REALIZADA;
+}
+
+/**
  * @brief   Envío la información almacenada en la estructura de salida.
  * @param   None.
  * @retval  Estado de la operación (OPERACION_NO_REALIZADA, TRANSMISION_REALIZADA).
@@ -376,8 +391,8 @@ MRF24_State_t MRF24TransmitirDato(void) {
 	SetLongAddr(pos_mem++, (uint8_t) (data_out_s.destinity_panid >> SHIFT_BYTE));
 	SetLongAddr(pos_mem++, (uint8_t) data_out_s.destinity_address);
 	SetLongAddr(pos_mem++, (uint8_t) (data_out_s.destinity_address >> SHIFT_BYTE));
-	SetLongAddr(pos_mem++, (uint8_t) data_config_s.my_address);
-	SetLongAddr(pos_mem++, (uint8_t) (data_config_s.my_address >> SHIFT_BYTE));
+	SetLongAddr(pos_mem++, (uint8_t) data_out_s.origin_address);
+	SetLongAddr(pos_mem++, (uint8_t) (data_out_s.origin_address >> SHIFT_BYTE));
 
 	for(int8_t i = 0; i < data_out_s.largo_mensaje; i++) {
 
@@ -446,6 +461,17 @@ uint16_t MRF24GetMiPANID(void) {
 
 	return data_config_s.my_panid;
 }
+
+/**
+ * @brief   Obtengo el short address en el que estoy.
+ * @param   None.
+ * @retval  La dirección de 2 bytes de mi address.
+ */
+uint16_t MRF24GetMyAddr(void) {
+
+	return data_config_s.my_address;
+}
+
 
 
 

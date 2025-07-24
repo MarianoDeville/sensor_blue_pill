@@ -38,6 +38,7 @@ void bucle(void) {
 	MRF24SetPANIDDestino(MRF24GetMiPANID());
 	//MRF24SetDireccionDestino(BROADCAST);
 	//MRF24SetPANIDDestino(0x1234);
+	MRF24SetDireccionOrigen(MRF24GetMyAddr());
 
 	while(1) {
 
