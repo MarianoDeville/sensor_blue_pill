@@ -18,10 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "../../App/Inc/app_principal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app_principal.h"
 
 /* USER CODE END Includes */
 
@@ -197,10 +197,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED_ROJO_Pin|LED_AMARILLO_Pin|LED_VERDE_Pin|GPIO_PIN_8, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, LED_VERDE_Pin|LED_AMARILLO_Pin|LED_ROJO_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, MRF24_RESET_Pin|MRF24_WAKE_Pin|MRF24_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, MRF24_CS_Pin|MRF24_RESET_Pin|MRF24_WAKE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : LED_BOARD_Pin */
   GPIO_InitStruct.Pin = LED_BOARD_Pin;
@@ -209,20 +209,31 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_BOARD_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED_ROJO_Pin LED_AMARILLO_Pin LED_VERDE_Pin MRF24_RESET_Pin
-                           MRF24_WAKE_Pin MRF24_CS_Pin PB8 */
-  GPIO_InitStruct.Pin = LED_ROJO_Pin|LED_AMARILLO_Pin|LED_VERDE_Pin|MRF24_RESET_Pin
-                          |MRF24_WAKE_Pin|MRF24_CS_Pin|GPIO_PIN_8;
+  /*Configure GPIO pins : LED_VERDE_Pin LED_AMARILLO_Pin LED_ROJO_Pin */
+  GPIO_InitStruct.Pin = LED_VERDE_Pin|LED_AMARILLO_Pin|LED_ROJO_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : MRF24_INTERRUP_Pin PULSADOR_Pin */
-  GPIO_InitStruct.Pin = MRF24_INTERRUP_Pin|PULSADOR_Pin;
+  /*Configure GPIO pins : PULSADOR_Pin PULSADORB9_Pin */
+  GPIO_InitStruct.Pin = PULSADOR_Pin|PULSADORB9_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : MRF24_CS_Pin MRF24_RESET_Pin MRF24_WAKE_Pin */
+  GPIO_InitStruct.Pin = MRF24_CS_Pin|MRF24_RESET_Pin|MRF24_WAKE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : MRF24_INTERRUP_Pin */
+  GPIO_InitStruct.Pin = MRF24_INTERRUP_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(MRF24_INTERRUP_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -243,8 +254,8 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-
-	  HAL_GPIO_TogglePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin);
+	  HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(LED_ROJO_GPIO_Port, LED_ROJO_Pin, GPIO_PIN_RESET);
   }
   /* USER CODE END Error_Handler_Debug */
 }

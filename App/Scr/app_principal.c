@@ -2,16 +2,18 @@
 ******************************************************************************
  * @file    app_principal.c
  * @author  Lcdo. Mariano Ariel Deville
- * @brief   Implementación de delay no bloqueante.
+ * @brief
  *******************************************************************************
  * @attention
  *
  *******************************************************************************
  */
+#include <string.h>
 #include "app_principal.h"
-#include "app_delay_unlock.h"
-#include "app_debounce.h"
 #include "drv_MRF24J40.h"
+#include "app_leds.h"
+#include "app_debounce.h"
+#include "app_delay_unlock.h"
 
 /* Private define ------------------------------------------------------------*/
 #define LOW_END_ADDR	(0x1112)
@@ -26,22 +28,37 @@ static void CheckBoton(void);
 void bucle(void) {
 
 	DebounceFSMInit(&boton1);
+	set_led(VERDE, LED_APAGADO);
+	set_led(AMARILLO, LED_APAGADO);
+	set_led(ROJO, LED_APAGADO);
 
 	if(MRF24J40Init() != INICIALIZACION_OK)
 		Error_Handler();
-
-	//MRF24SetDireccionDestino(LOW_END_ADDR);
-	MRF24SetDireccionDestino(BROADCAST);
-	//MRF24SetPANIDDestino(MRF24GetMiPANID());
-	MRF24SetPANIDDestino(0xFFFF);
+	MRF24SetDireccionDestino(LOW_END_ADDR);
+	MRF24SetPANIDDestino(MRF24GetMiPANID());
+	//MRF24SetDireccionDestino(BROADCAST);
+	//MRF24SetPANIDDestino(0x1234);
 
 	while(1) {
 
-
-
 		CheckBoton();
 
-		HAL_GPIO_WritePin(LED_VERDE_GPIO_Port, LED_VERDE_Pin, MRF24IsNewMsg());
+		if(MRF24IsNewMsg() == MSG_PRESENTE) {
+
+			MRF24ReciboPaquete();
+
+			unsigned char msg[50] = {0};
+			strcpy((char*)msg, (const char*)MRF24GetMensajeEntrada());
+
+			set_led(VERDE, LED_PRENDIDO);
+		} else {
+
+			set_led(VERDE, LED_APAGADO);
+		}
+
+
+
+
 	}
 }
 
@@ -57,16 +74,16 @@ static void CheckBoton(void){
 
 		case PRESIONO_BOTON:
 
-			HAL_GPIO_TogglePin(LED_AMARILLO_GPIO_Port, LED_AMARILLO_Pin);
-			MRF24SetMensajeSalida("CMD:PLA");
+			toggle_led(AMARILLO);
+			MRF24SetMensajeSalida("CMD:ALA");
 			MRF24TransmitirDato();
 			break;
 
 		case SUELTO_BOTON:
 
-			HAL_GPIO_TogglePin(LED_ROJO_GPIO_Port, LED_ROJO_Pin);
-//			MRF24SetMensajeSalida("CMD:ALA");
-//			MRF24TransmitirDato();
+			toggle_led(ROJO);
+			MRF24SetMensajeSalida("CMD:PLA");
+			MRF24TransmitirDato();
 			break;
 
 		case RUIDO:

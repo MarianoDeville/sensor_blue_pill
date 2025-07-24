@@ -11,7 +11,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "drv_MRF24J40_port.h"
-#include "compatibility.h"
+#include "../../App/Inc/compatibility.h"
 
 extern SPI_HandleTypeDef hspi1;
 /**

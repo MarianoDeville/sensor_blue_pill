@@ -12,7 +12,7 @@
 #define INC_DRV_MRF24J40_PORT_H_
 
 /* Includes ------------------------------------------------------------------*/
-#include "compatibility.h"
+#include "../../App/Inc/compatibility.h"
 
 #define _1_BYTE			(0x01)
 #define _2_BYTES		(0x02)

@@ -11,7 +11,7 @@
 #ifndef INC_DRV_MRF24J40_H_
 #define INC_DRV_MRF24J40_H_
 
-#include "compatibility.h"
+#include "../../App/Inc/compatibility.h"
 
 /* Macros --------------------------------------------------------------------*/
 #define	BROADCAST		(0xFFFF)
@@ -21,6 +21,7 @@
 #define LARGE_MAC_SIZE	8
 #define SEC_KEY_SIZE	16
 #define WAIT_1_MS		1
+#define WAIT_50_MS		50
 
 /* Canales disponibles para el IEEE 802.15.4 ---------------------------------*/
 typedef enum {
@@ -41,7 +42,7 @@ typedef enum {
 	CH_24 = 0xD3,
 	CH_25 = 0xE3,
 	CH_26 = 0xF3
-} channel_list;
+} channel_list_t;
 
 /* Respuesta de las funciones ------------------------------------------------*/
 typedef enum {
@@ -57,6 +58,14 @@ typedef enum {
 	ERROR_INESPERADO,
 } MRF24_State_t;
 
+/* Estructura con la lista de dispositivos cercanos --------------------------*/
+typedef struct { uint8_t channel;
+                 uint16_t panid;
+                 uint8_t long_address[8];
+                 uint16_t short_address;
+                 uint8_t rssi;
+} MRF24_discover_nearby_t;
+
 /* Prototipo de funciones públicas -------------------------------------------*/
 MRF24_State_t MRF24J40Init(void);
 MRF24_State_t MRF24SetMensajeSalida(const char * mensaje);
@@ -65,7 +74,9 @@ MRF24_State_t MRF24SetPANIDDestino(uint16_t panid);
 MRF24_State_t MRF24TransmitirDato(void);
 volatile MRF24_State_t MRF24IsNewMsg(void);
 MRF24_State_t MRF24ReciboPaquete(void);
-uint8_t * MRF24GetMensajeEntrada(void);
+unsigned char * MRF24GetMensajeEntrada(void);
 uint16_t MRF24GetMiPANID(void);
 
+MRF24_State_t MRF24BuscarDispositivos(void);
+MRF24_State_t MRF24TransmitirDatoEncriptado(void);
 #endif /* INC_DRV_MRF24J40_H_ */

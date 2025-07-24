@@ -9,7 +9,7 @@
  *******************************************************************************
  */
 
-#include "app_debounce.h"
+#include "../Inc/app_debounce.h"
 
 /**
  * Macros
@@ -24,7 +24,7 @@
 void DebounceFSMInit(debounceData_t * antirrebote_boton_n) {
 
 	assert_param(antirrebote_boton_n);
-	antirrebote_boton_n->estadoActual = BUTTON_UP;
+	antirrebote_boton_n->estadoActual = BOTON_SIN_CAMBIOS;
 	DelayInit(&antirrebote_boton_n->delay_anti_rebote, TIEMPO_ANTI_REBOTE);
 }
 
