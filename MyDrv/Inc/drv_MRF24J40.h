@@ -11,7 +11,7 @@
 #ifndef INC_DRV_MRF24J40_H_
 #define INC_DRV_MRF24J40_H_
 
-#include "../../App/Inc/compatibility.h"
+#include "compatibility.h"
 
 /* Macros --------------------------------------------------------------------*/
 #define	BROADCAST		(0xFFFF)
@@ -59,11 +59,13 @@ typedef enum {
 } MRF24_State_t;
 
 /* Estructura con la lista de dispositivos cercanos --------------------------*/
-typedef struct { uint8_t channel;
-                 uint16_t panid;
-                 uint8_t long_address[8];
-                 uint16_t short_address;
-                 uint8_t rssi;
+typedef struct {
+
+	uint8_t channel;
+	uint16_t panid;
+	uint8_t long_address[8];
+	uint16_t short_address;
+	uint8_t rssi;
 } MRF24_discover_nearby_t;
 
 /* Prototipo de funciones públicas -------------------------------------------*/
@@ -78,6 +80,7 @@ MRF24_State_t MRF24ReciboPaquete(void);
 unsigned char * MRF24GetMensajeEntrada(void);
 uint16_t MRF24GetMiPANID(void);
 uint16_t MRF24GetMyAddr(void);
+uint16_t MRF24GetSrcAddrMsg(void);
 
 
 MRF24_State_t MRF24BuscarDispositivos(void);

@@ -39,6 +39,7 @@ void DebounceFSMInit(debounceData_t * antirrebote_boton_n) {
 estadoPulsador_t DebounceFSMUpdate(debounceData_t * antirrebote_boton_n, bool_t estado_pin) {
 
 	assert_param(antirrebote_boton_n);
+
 	switch(antirrebote_boton_n->estadoActual) {
 
 		case BUTTON_UP:

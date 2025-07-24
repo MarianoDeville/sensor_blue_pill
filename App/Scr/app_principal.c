@@ -50,7 +50,7 @@ void bucle(void) {
 
 			unsigned char msg[50] = {0};
 			strcpy((char*)msg, (const char*)MRF24GetMensajeEntrada());
-
+			uint16_t addscr = MRF24GetSrcAddrMsg();
 			set_led(VERDE, LED_PRENDIDO);
 		} else {
 

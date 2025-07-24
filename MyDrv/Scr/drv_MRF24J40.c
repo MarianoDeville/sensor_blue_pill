@@ -17,7 +17,6 @@
 #include "drv_MRF24J40_port.h"
 #include "app_delay_unlock.h"
 
-
 /* Definiciones de la configuración por defecto ------------------------------*/
 #define	DEFAULT_CHANNEL		CH_11
 #define DEFAULT_SEC_NUMBER	(0X01)
@@ -65,31 +64,37 @@ static const uint8_t default_security_key[] = {0x00,
                                                0x15};
 
 /* Estructura con la información del dispositivo */
-static struct {	bool_t get_new_msg;
-				bool_t put_new_msg;
-				uint8_t sequence_number;
-				uint8_t my_channel;
-				uint8_t security_key[16];
-				uint8_t my_mac[8];
-				uint16_t my_panid;
-				uint16_t my_address;
-				uint16_t intervalo;
+static struct {
+
+	bool_t get_new_msg;
+	bool_t put_new_msg;
+	uint8_t sequence_number;
+	uint8_t my_channel;
+	uint8_t security_key[16];
+	uint8_t my_mac[8];
+	uint16_t my_panid;
+	uint16_t my_address;
+	uint16_t intervalo;
 }data_config_s;
 
 /* Estructura con la información de transmisión */
-static struct {	uint16_t destinity_panid;
-				uint16_t destinity_address;
-				uint16_t origin_address;
-				uint8_t largo_mensaje;
-				const char * buffer;
+static struct {
+
+	uint16_t destinity_panid;
+	uint16_t destinity_address;
+	uint16_t origin_address;
+	uint8_t largo_mensaje;
+	const char * buffer;
 }data_out_s;
 
 /* Estructura con la información de recepción */
-static struct {	uint16_t source_panid;
-				uint16_t source_address;
-				uint8_t tamano_mensaje;
-				uint8_t rssi;
-				uint8_t buffer[50];
+static struct {
+
+	uint16_t source_panid;
+	uint16_t source_address;
+	uint8_t tamano_mensaje;
+	uint8_t rssi;
+	uint8_t buffer[50];
 }data_in_s;
 
 /* Prototipo de funciones privadas -------------------------------------------*/
@@ -163,7 +168,7 @@ static MRF24_State_t InicializoMRF24(void) {
 	SetLongAddr(SLPCON1, CLKOUTDIS | SLPCLKDIV0);
 	SetShortAddr(BBREG2, CCA_MODE_1);
 	SetShortAddr(BBREG6, RSSIMODE2);
-	SetShortAddr(CCAEDTH, CCAEDTH6 | CCAEDTH5);
+	SetShortAddr(CCAEDTH, CCAEDTH2 | CCAEDTH1);
 	SetShortAddr(PACON2, FIFOEN | TXONTS2 | TXONTS1);
 	SetShortAddr(TXSTBL, RFSTBL3 | RFSTBL0 | MSIFS2 | MSIFS0);
 	DelayReset(&delay_time_out);
@@ -427,15 +432,16 @@ MRF24_State_t MRF24ReciboPaquete(void) {
 
 	if(estadoActual != INICIALIZACION_OK)
 		return OPERACION_NO_REALIZADA;
-	uint8_t index;
-	uint8_t largo_mensaje;
 	SetLongAddr(BBREG1, RXDECINV);
 	SetShortAddr(RXFLUSH, DATAONLY);
-	largo_mensaje = GetLongAddr(RX_FIFO);
+	uint8_t largo_mensaje = GetLongAddr(RX_FIFO);
+	uint16_t add = GetLongAddr(RX_FIFO + 9);
+	add = (add << SHIFT_BYTE) | GetLongAddr(RX_FIFO + 8);
+	data_in_s.source_address = add;
 
-	for(index = 0; index < largo_mensaje - FCS_LQI_RSSI; index++) {
+	for(uint8_t i = 0; i < largo_mensaje - FCS_LQI_RSSI; i++) {
 
-		data_in_s.buffer[index] = GetLongAddr(RX_FIFO + HEAD_LENGTH + index - 1);//////////////////////////////
+		data_in_s.buffer[i] = GetLongAddr(RX_FIFO + HEAD_LENGTH + i - 1);
 	}
 	SetLongAddr(BBREG1, VACIO);
 	(void)GetShortAddr(INTSTAT);
@@ -471,6 +477,18 @@ uint16_t MRF24GetMyAddr(void) {
 
 	return data_config_s.my_address;
 }
+
+/**
+ * @brief   Obtengo el short address del origen del mensaje.
+ * @param   None.
+ * @retval  La dirección de 2 bytes del source address.
+ */
+uint16_t MRF24GetSrcAddrMsg(void) {
+
+	return data_in_s.source_address;
+}
+
+
 
 
 
