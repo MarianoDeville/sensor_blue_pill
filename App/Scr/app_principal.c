@@ -21,7 +21,6 @@
 /* Variables privadas --------------------------------------------------------*/
 static debounceData_t boton1;
 
-
 /* Prototipo de funciones privadas -------------------------------------------*/
 static void CheckBoton(void);
 
@@ -34,11 +33,7 @@ void bucle(void) {
 
 	if(MRF24J40Init() != INICIALIZACION_OK)
 		Error_Handler();
-	MRF24SetDireccionDestino(LOW_END_ADDR);
-	MRF24SetPANIDDestino(MRF24GetMiPANID());
-	//MRF24SetDireccionDestino(BROADCAST);
-	//MRF24SetPANIDDestino(0x1234);
-	MRF24SetDireccionOrigen(MRF24GetMyAddr());
+	mrf24_data_in_t * mrf24_data_in;
 
 	while(1) {
 
@@ -46,24 +41,23 @@ void bucle(void) {
 
 		if(MRF24IsNewMsg() == MSG_PRESENTE) {
 
-			MRF24ReciboPaquete();
+			if(MRF24ReciboPaquete() == MSG_LEIDO) {
 
-			unsigned char msg[50] = {0};
-			strcpy((char*)msg, (const char*)MRF24GetMensajeEntrada());
-			uint16_t addscr = MRF24GetSrcAddrMsg();
-			set_led(VERDE, LED_PRENDIDO);
+				mrf24_data_in = MRF24DataIn();
+				unsigned char msg[50] = {0};
+				strcpy((char*)msg, (const char*)mrf24_data_in->buffer);
+				uint16_t addscr = mrf24_data_in->source_address;
+				set_led(VERDE, LED_PRENDIDO);
+			} else {
+
+				toggle_led(AMARILLO);
+			}
 		} else {
 
 			set_led(VERDE, LED_APAGADO);
 		}
-
-
-
-
 	}
 }
-
-
 
 /**
   * @brief  Manejo de las pulsaciones del botón
@@ -71,35 +65,34 @@ void bucle(void) {
   */
 static void CheckBoton(void){
 
+	mrf24_data_out_t data_out_s;
+	data_out_s.dest_address = LOW_END_ADDR;
+	data_out_s.dest_panid = MRF24GetMiPANID();
+	data_out_s.origin_address = MRF24GetMyAddr();
+
 	switch(DebounceFSMUpdate(&boton1, HAL_GPIO_ReadPin(PULSADOR_GPIO_Port, PULSADOR_Pin))) {
 
 		case PRESIONO_BOTON:
-
-			toggle_led(AMARILLO);
-			MRF24SetMensajeSalida("CMD:ALA");
-			MRF24TransmitirDato();
+			toggle_led(ROJO);
+			strcpy(data_out_s.buffer, "CMD:ALA");
+			MRF24TransmitirDato(&data_out_s);
 			break;
 
 		case SUELTO_BOTON:
-
 			toggle_led(ROJO);
-			MRF24SetMensajeSalida("CMD:PLA");
-			MRF24TransmitirDato();
+			strcpy(data_out_s.buffer, "CMD:PLA");
+			MRF24TransmitirDato(&data_out_s);
 			break;
 
 		case RUIDO:
-
 			break;
 
 		case ERROR_ANTI_REBOTE:
-
 			break;
 
 		case BOTON_SIN_CAMBIOS:
-
 			break;
 
 		default:
-
 	}
 }

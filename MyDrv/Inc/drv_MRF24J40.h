@@ -56,7 +56,8 @@ typedef enum {
 	OPERACION_NO_REALIZADA,
 	OPERACION_REALIZADA,
 	ERROR_INESPERADO,
-} MRF24_State_t;
+	NO_DIRECCION,
+} mrf24_state_t;
 
 /* Estructura con la lista de dispositivos cercanos --------------------------*/
 typedef struct {
@@ -68,21 +69,41 @@ typedef struct {
 	uint8_t rssi;
 } MRF24_discover_nearby_t;
 
+/* Estructura con la información de transmisión ------------------------------*/
+typedef struct {
+
+	uint16_t dest_panid;
+	uint16_t dest_address;
+	uint16_t origin_address;
+	char buffer[50];
+}mrf24_data_out_t;
+
+/* Estructura con la información de recepción --------------------------------*/
+typedef struct {
+
+	uint16_t source_panid;
+	uint16_t source_address;
+	uint8_t tamano_mensaje;
+	uint8_t rssi;
+	char buffer[50];
+}mrf24_data_in_t;
+
 /* Prototipo de funciones públicas -------------------------------------------*/
-MRF24_State_t MRF24J40Init(void);
-MRF24_State_t MRF24SetMensajeSalida(const char * mensaje);
-MRF24_State_t MRF24SetDireccionDestino(uint16_t direccion);
-MRF24_State_t MRF24SetPANIDDestino(uint16_t panid);
-MRF24_State_t MRF24SetDireccionOrigen(uint16_t direccion);
-MRF24_State_t MRF24TransmitirDato(void);
-volatile MRF24_State_t MRF24IsNewMsg(void);
-MRF24_State_t MRF24ReciboPaquete(void);
-unsigned char * MRF24GetMensajeEntrada(void);
+// Configuración del módulo
+mrf24_state_t MRF24J40Init(void);
 uint16_t MRF24GetMiPANID(void);
 uint16_t MRF24GetMyAddr(void);
-uint16_t MRF24GetSrcAddrMsg(void);
 
+// Mensajes salientes
+mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * info_out_s);
 
-MRF24_State_t MRF24BuscarDispositivos(void);
-MRF24_State_t MRF24TransmitirDatoEncriptado(void);
+// Mensajes entrantes
+volatile mrf24_state_t MRF24IsNewMsg(void);
+mrf24_state_t MRF24ReciboPaquete(void);
+mrf24_data_in_t * MRF24DataIn(void);
+
+//
+mrf24_state_t MRF24BuscarDispositivos(void);
+mrf24_state_t MRF24TransmitirDatoEncriptado(void);
+
 #endif /* INC_DRV_MRF24J40_H_ */
