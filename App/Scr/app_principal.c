@@ -44,17 +44,17 @@ void bucle(void) {
 			if(MRF24ReciboPaquete() == MSG_LEIDO) {
 
 				mrf24_data_in = MRF24DataIn();
-				unsigned char msg[50] = {0};
+				char msg[50] = {0};
 				strcpy((char*)msg, (const char*)mrf24_data_in->buffer);
-				uint16_t addscr = mrf24_data_in->source_address;
-				set_led(VERDE, LED_PRENDIDO);
+
+				if(!strcmp(msg, "CMD:PLV"))
+					set_led(VERDE, LED_PRENDIDO);
+				if(!strcmp(msg, "CMD:ALV"))
+					set_led(VERDE, LED_APAGADO);
 			} else {
 
 				toggle_led(AMARILLO);
 			}
-		} else {
-
-			set_led(VERDE, LED_APAGADO);
 		}
 	}
 }
@@ -70,7 +70,7 @@ static void CheckBoton(void){
 	data_out_s.dest_panid = MRF24GetMiPANID();
 	data_out_s.origin_address = MRF24GetMyAddr();
 
-	switch(DebounceFSMUpdate(&boton1, HAL_GPIO_ReadPin(PULSADOR_GPIO_Port, PULSADOR_Pin))) {
+	switch(DebounceFSMUpdate(&boton1, HAL_GPIO_ReadPin(BTN_GPIO_Port, BTN_Pin))) {
 
 		case PRESIONO_BOTON:
 			toggle_led(ROJO);

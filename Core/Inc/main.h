@@ -65,8 +65,8 @@ void Error_Handler(void);
 #define LED_AMARILLO_GPIO_Port GPIOB
 #define LED_ROJO_Pin GPIO_PIN_14
 #define LED_ROJO_GPIO_Port GPIOB
-#define PULSADOR_Pin GPIO_PIN_15
-#define PULSADOR_GPIO_Port GPIOB
+#define BTN_Pin GPIO_PIN_15
+#define BTN_GPIO_Port GPIOB
 #define MRF24_CS_Pin GPIO_PIN_9
 #define MRF24_CS_GPIO_Port GPIOA
 #define MRF24_RESET_Pin GPIO_PIN_10
@@ -75,8 +75,6 @@ void Error_Handler(void);
 #define MRF24_WAKE_GPIO_Port GPIOA
 #define MRF24_INTERRUP_Pin GPIO_PIN_12
 #define MRF24_INTERRUP_GPIO_Port GPIOA
-#define PULSADORB9_Pin GPIO_PIN_9
-#define PULSADORB9_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

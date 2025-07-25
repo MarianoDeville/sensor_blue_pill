@@ -352,14 +352,14 @@ mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * info_out_s) {
 	if(info_out_s->dest_panid == VACIO)
 		info_out_s->dest_panid = data_config_s.my_panid;
 	SetLongAddr(pos_mem++, (uint8_t) info_out_s->dest_panid);
-	SetLongAddr(pos_mem++, (uint8_t) info_out_s->dest_panid >> SHIFT_BYTE);
+	SetLongAddr(pos_mem++, (uint8_t) (info_out_s->dest_panid >> SHIFT_BYTE));
 	SetLongAddr(pos_mem++, (uint8_t) info_out_s->dest_address);
-	SetLongAddr(pos_mem++, (uint8_t) info_out_s->dest_address >> SHIFT_BYTE);
+	SetLongAddr(pos_mem++, (uint8_t) (info_out_s->dest_address >> SHIFT_BYTE));
 
 	if(info_out_s->origin_address == VACIO)
 		info_out_s->origin_address = data_config_s.my_address;
 	SetLongAddr(pos_mem++, (uint8_t) info_out_s->origin_address);
-	SetLongAddr(pos_mem++, (uint8_t) info_out_s->origin_address >> SHIFT_BYTE);
+	SetLongAddr(pos_mem++, (uint8_t) (info_out_s->origin_address >> SHIFT_BYTE));
 
 	for(int8_t i = 0; i < largo_mensaje; i++) {
 
@@ -393,6 +393,17 @@ volatile mrf24_state_t MRF24IsNewMsg(void) {
  * @retval  Estado de la operación (OPERACION_NO_REALIZADA, MSG_LEIDO).
  */
 mrf24_state_t MRF24ReciboPaquete(void) {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/*
+	 * agregar la lectura del rssi y del lq, vienen en el paquete del mensaje.
+	 */
+
 
 	if(estadoActual != INICIALIZACION_OK)
 		return OPERACION_NO_REALIZADA;

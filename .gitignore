@@ -55,3 +55,6 @@ Debug/App/Scr/app_principal.cyclo
 Debug/MyDrv/Scr/drv_MRF24J40.cyclo
 Debug/sensor_blue_pill.list
 /Debug
+Debug/App/Scr/app_principal.cyclo
+Debug/Core/Src/main.cyclo
+Debug/sensor_blue_pill.list
