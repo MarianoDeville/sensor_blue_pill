@@ -23,7 +23,7 @@ typedef enum {
 	BUTTON_FALLING,
 	BUTTON_DOWN,
 	BUTTON_RAISING,
-} debounceState_t;
+} debounce_state_t;
 
 /**
  * Respuestas de la máquina de estados.
@@ -35,21 +35,21 @@ typedef enum {
 	SUELTO_BOTON,
 	BOTON_SIN_CAMBIOS,
 	RUIDO,
-} estadoPulsador_t;
+} estado_pulsador_t;
 
 /**
  * Estructura definida para el manejo del antirrebote.
  */
 typedef struct {
 
-	debounceState_t estadoActual;
-	delayNoBloqueanteData delay_anti_rebote;
-} debounceData_t;
+	debounce_state_t estadoActual;
+	delayNoBloqueanteData_t delay_anti_rebote;
+} debounce_data_t;
 
 /**
  * Prototipo de funciones públicas.
  */
-void DebounceFSMInit(debounceData_t * antirrebote_boton_n);
-estadoPulsador_t DebounceFSMUpdate(debounceData_t * antirrebote_boton_n, bool_t estado_pin);
+void DebounceFSMInit(debounce_data_t * antirrebote_boton_n);
+estado_pulsador_t DebounceFSMUpdate(debounce_data_t * antirrebote_boton_n, bool_t estado_pin);
 
 #endif /* API_INC_API_DEBOUNCE_H_ */

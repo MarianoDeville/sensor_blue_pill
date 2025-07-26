@@ -254,7 +254,6 @@ void Error_Handler(void)
   while (1)
   {
 	  HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(LED_ROJO_GPIO_Port, LED_ROJO_Pin, GPIO_PIN_RESET);
   }
   /* USER CODE END Error_Handler_Debug */
 }

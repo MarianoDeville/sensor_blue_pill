@@ -25,14 +25,15 @@ typedef struct{
 	tick_t startTime;
 	tick_t duration;
 	bool_t running;
-} delayNoBloqueanteData;
+} delayNoBloqueanteData_t;
 
 /**
  * Prototipo de funciones públicas.
  */
-void DelayInit(delayNoBloqueanteData * delay, tick_t duration);
-bool_t DelayRead(delayNoBloqueanteData * delay );
-void DelayWrite(delayNoBloqueanteData * delay, tick_t duration);
-void DelayReset( delayNoBloqueanteData * delay);
+void DelayInit(delayNoBloqueanteData_t * delay, tick_t duration);
+bool_t DelayRead(delayNoBloqueanteData_t * delay );
+void DelayWrite(delayNoBloqueanteData_t * delay, tick_t duration);
+void DelayReset( delayNoBloqueanteData_t * delay);
+//uint16_t
 
 #endif /* API_INC_API_DELAY_H_ */

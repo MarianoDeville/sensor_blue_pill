@@ -15,6 +15,14 @@
 #include "main.h"
 #include "compatibility.h"
 
+typedef struct {
+
+	char playa[20];
+	char sector[20];
+	char box[10];
+	char piso[10];
+}system_config_t;
+
 
 void bucle(void);
 

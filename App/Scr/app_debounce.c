@@ -21,7 +21,7 @@
   * @param  Puntero a la estructura que contiene las variabes.
   * @retval None
   */
-void DebounceFSMInit(debounceData_t * antirrebote_boton_n) {
+void DebounceFSMInit(debounce_data_t * antirrebote_boton_n) {
 
 	assert_param(antirrebote_boton_n);
 	antirrebote_boton_n->estadoActual = BOTON_SIN_CAMBIOS;
@@ -36,7 +36,7 @@ void DebounceFSMInit(debounceData_t * antirrebote_boton_n) {
   * @note	En el enunciado la función no posee parámetros, pero de esta forma independizo totalmente
   * 		el driver del hardware en donde lo implemento.
   */
-estadoPulsador_t DebounceFSMUpdate(debounceData_t * antirrebote_boton_n, bool_t estado_pin) {
+estado_pulsador_t DebounceFSMUpdate(debounce_data_t * antirrebote_boton_n, bool_t estado_pin) {
 
 	assert_param(antirrebote_boton_n);
 

@@ -1,2 +1,4 @@
-../App/Scr/app_principal.c:27:6:bucle	6
-../App/Scr/app_principal.c:66:13:CheckBoton	4
+../App/Scr/app_principal.c:33:6:bucle	6
+../App/Scr/app_principal.c:82:13:GetEEPROMtoMRF24Config	3
+../App/Scr/app_principal.c:100:13:ModoSetup	8
+../App/Scr/app_principal.c:157:13:CheckBoton	3

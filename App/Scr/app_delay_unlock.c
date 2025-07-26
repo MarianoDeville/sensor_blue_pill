@@ -12,7 +12,7 @@
 #include "../Inc/app_delay_unlock.h"
 
 /* Prototipo de funciones privadas -------------------------------------------*/
-static bool_t DelayIsRunning(delayNoBloqueanteData * delay);
+static bool_t DelayIsRunning(delayNoBloqueanteData_t * delay);
 
 /**
   * @brief  Inicializa el delay no bloqueante.
@@ -20,7 +20,7 @@ static bool_t DelayIsRunning(delayNoBloqueanteData * delay);
   * @param  Duración del delay.
   * @retval None
   */
-void DelayInit(delayNoBloqueanteData * delay, tick_t duration) {
+void DelayInit(delayNoBloqueanteData_t * delay, tick_t duration) {
 
 	if(delay == NULL || duration == 0)
 		Error_Handler();
@@ -34,7 +34,7 @@ void DelayInit(delayNoBloqueanteData * delay, tick_t duration) {
   * @param  Puntero a la estructura con las variables.
   * @retval Estado del delay (contando / tiempo cumplido).
   */
-bool_t DelayRead(delayNoBloqueanteData * delay) {
+bool_t DelayRead(delayNoBloqueanteData_t * delay) {
 
 	if(delay == NULL)
 		Error_Handler();
@@ -60,7 +60,7 @@ bool_t DelayRead(delayNoBloqueanteData * delay) {
   * @param  Duración del delay.
   * @retval None
   */
-void DelayWrite(delayNoBloqueanteData * delay, tick_t duration) {
+void DelayWrite(delayNoBloqueanteData_t * delay, tick_t duration) {
 
 	if(delay == NULL || duration == 0)
 		Error_Handler();
@@ -73,7 +73,7 @@ void DelayWrite(delayNoBloqueanteData * delay, tick_t duration) {
   * @param  Puntero a la estructura con las variables.
   * @retval None
   */
-void DelayReset( delayNoBloqueanteData * delay) {
+void DelayReset( delayNoBloqueanteData_t * delay) {
 
 	delay->startTime = HAL_GetTick();
 	delay->running = true;
@@ -88,7 +88,7 @@ void DelayReset( delayNoBloqueanteData * delay) {
   * 		el encapsulamiento la defino como privada ya que solo se utiliza en el
   * 		ámbito de este archivo.
   */
-static bool_t DelayIsRunning(delayNoBloqueanteData * delay) {
+static bool_t DelayIsRunning(delayNoBloqueanteData_t * delay) {
 
 	if(delay == NULL)
 		Error_Handler();

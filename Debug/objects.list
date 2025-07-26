@@ -1,5 +1,6 @@
 "./App/Scr/app_debounce.o"
 "./App/Scr/app_delay_unlock.o"
+"./App/Scr/app_eeprom.o"
 "./App/Scr/app_leds.o"
 "./App/Scr/app_principal.o"
 "./Core/Src/main.o"

@@ -37,6 +37,8 @@
 static mrf24_state_t estadoActual;
 static mrf24_data_out_t data_out_s = {0};
 static mrf24_data_in_t data_in_s = {0};
+static mrf24_data_config_t data_config_s = {0};
+
 
 /* MAC address por defecto del dispositivo */
 static const uint8_t default_mac_address[] = {0x11,
@@ -66,20 +68,6 @@ static const uint8_t default_security_key[] = {0x00,
                                                0x14,
                                                0x15};
 
-/* Estructura con la información del dispositivo */
-static struct {
-
-	bool_t get_new_msg;
-	bool_t put_new_msg;
-	uint8_t sequence_number;
-	uint8_t my_channel;
-	uint8_t security_key[16];
-	uint8_t my_mac[8];
-	uint16_t my_panid;
-	uint16_t my_address;
-	uint16_t intervalo;
-}data_config_s;
-
 /* Prototipo de funciones privadas -------------------------------------------*/
 static void InicializoVariables(void);
 static mrf24_state_t InicializoMRF24(void);
@@ -99,18 +87,19 @@ static void SetDeviceMACAddress(void);
  */
 static void InicializoVariables(void) {
 
-	strncpy((char *)data_config_s.security_key,
-			(char *) default_security_key,
-			SEC_KEY_SIZE);
-	strncpy((char *)data_config_s.my_mac,
-			(char *) default_mac_address,
-			LARGE_MAC_SIZE);
-	data_config_s.sequence_number = DEFAULT_SEC_NUMBER;
-	data_config_s.my_channel = DEFAULT_CHANNEL;
-	data_config_s.get_new_msg = false;
-	data_config_s.put_new_msg = false;
-	data_config_s.my_panid = MY_DEFAULT_PAN_ID;
-	data_config_s.my_address = MY_DEFAULT_ADDRESS;
+	if(data_config_s.my_address == 0 || data_config_s.my_panid == 0) {
+
+		strncpy((char *)data_config_s.security_key,
+				(char *) default_security_key,
+				SEC_KEY_SIZE);
+		strncpy((char *)data_config_s.my_mac,
+				(char *) default_mac_address,
+				LARGE_MAC_SIZE);
+		data_config_s.sequence_number = DEFAULT_SEC_NUMBER;
+		data_config_s.my_channel = DEFAULT_CHANNEL;
+		data_config_s.my_panid = MY_DEFAULT_PAN_ID;
+		data_config_s.my_address = MY_DEFAULT_ADDRESS;
+	}
 	return;
 }
 
@@ -122,7 +111,7 @@ static void InicializoVariables(void) {
 static mrf24_state_t InicializoMRF24(void) {
 
 	uint8_t lectura;
-	delayNoBloqueanteData delay_time_out;
+	delayNoBloqueanteData_t delay_time_out;
 	DelayInit(&delay_time_out, MRF_TIME_OUT);
 	SetShortAddr(SOFTRST, RSTPWR | RSTBB | RSTMAC);
 	DelayReset(&delay_time_out);
@@ -306,23 +295,14 @@ mrf24_state_t MRF24J40Init(void) {
 }
 
 /**
- * @brief   Obtengo el PANID en el que estoy.
+ * @brief   Devuelvo el puntero a la estructura que contiene la información de
+ * 			configuración del módulo MRF24J40.
  * @param   None.
- * @retval  La dirección de 2 bytes de mi PANID.
+ * @retval  Puntero a la estructura tipo mrf24_data_config_t.
  */
-uint16_t MRF24GetMiPANID(void) {
+mrf24_data_config_t * MRF24GetConfig(void) {
 
-	return data_config_s.my_panid;
-}
-
-/**
- * @brief   Obtengo el short address en el que estoy.
- * @param   None.
- * @retval  La dirección de 2 bytes de mi address.
- */
-uint16_t MRF24GetMyAddr(void) {
-
-	return data_config_s.my_address;
+	return &data_config_s;
 }
 
 /**
@@ -331,15 +311,15 @@ uint16_t MRF24GetMyAddr(void) {
  * @retval  Estado de la operación (OPERACION_NO_REALIZADA,
  * 			TRANSMISION_REALIZADA, NO_DIRECCION, MSG_NO_PRESENTE).
  */
-mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * info_out_s) {
+mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s) {
 
 	if(estadoActual != INICIALIZACION_OK)
 		return OPERACION_NO_REALIZADA;
 
-	if(info_out_s->dest_address == VACIO)
+	if(p_info_out_s->dest_address == VACIO)
 		return NO_DIRECCION;
 	uint8_t pos_mem = 0;
-	unsigned largo_mensaje = strlen(info_out_s->buffer);
+	unsigned largo_mensaje = strlen(p_info_out_s->buffer);
 
 	if(largo_mensaje == 0)
 		return MSG_NO_PRESENTE;
@@ -349,21 +329,21 @@ mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * info_out_s) {
 	SetLongAddr(pos_mem++, SHORT_S_ADD | SHORT_D_ADD);			// MSB.
 	SetLongAddr(pos_mem++, data_config_s.sequence_number++);
 
-	if(info_out_s->dest_panid == VACIO)
-		info_out_s->dest_panid = data_config_s.my_panid;
-	SetLongAddr(pos_mem++, (uint8_t) info_out_s->dest_panid);
-	SetLongAddr(pos_mem++, (uint8_t) (info_out_s->dest_panid >> SHIFT_BYTE));
-	SetLongAddr(pos_mem++, (uint8_t) info_out_s->dest_address);
-	SetLongAddr(pos_mem++, (uint8_t) (info_out_s->dest_address >> SHIFT_BYTE));
+	if(p_info_out_s->dest_panid == VACIO)
+		p_info_out_s->dest_panid = data_config_s.my_panid;
+	SetLongAddr(pos_mem++, (uint8_t) p_info_out_s->dest_panid);
+	SetLongAddr(pos_mem++, (uint8_t) (p_info_out_s->dest_panid >> SHIFT_BYTE));
+	SetLongAddr(pos_mem++, (uint8_t) p_info_out_s->dest_address);
+	SetLongAddr(pos_mem++, (uint8_t) (p_info_out_s->dest_address >> SHIFT_BYTE));
 
-	if(info_out_s->origin_address == VACIO)
-		info_out_s->origin_address = data_config_s.my_address;
-	SetLongAddr(pos_mem++, (uint8_t) info_out_s->origin_address);
-	SetLongAddr(pos_mem++, (uint8_t) (info_out_s->origin_address >> SHIFT_BYTE));
+	if(p_info_out_s->origin_address == VACIO)
+		p_info_out_s->origin_address = data_config_s.my_address;
+	SetLongAddr(pos_mem++, (uint8_t) p_info_out_s->origin_address);
+	SetLongAddr(pos_mem++, (uint8_t) (p_info_out_s->origin_address >> SHIFT_BYTE));
 
 	for(int8_t i = 0; i < largo_mensaje; i++) {
 
-		SetLongAddr(pos_mem++, info_out_s->buffer[i]);
+		SetLongAddr(pos_mem++, p_info_out_s->buffer[i]);
 	}
 	SetLongAddr(pos_mem++, VACIO);
 	SetShortAddr(TXNCON, TXNACKREQ | TXNTRIG);
@@ -429,7 +409,7 @@ mrf24_state_t MRF24ReciboPaquete(void) {
  * @param   None.
  * @retval  Puntero a la estructura tipo mrf24_data_in_t.
  */
-mrf24_data_in_t * MRF24DataIn(void) {
+mrf24_data_in_t * MRF24GetDataIn(void) {
 
 	return &data_in_s;
 }

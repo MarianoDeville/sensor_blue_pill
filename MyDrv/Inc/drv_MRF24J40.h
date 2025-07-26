@@ -44,6 +44,7 @@ typedef enum {
 	CH_26 = 0xF3
 } channel_list_t;
 
+
 /* Respuesta de las funciones ------------------------------------------------*/
 typedef enum {
 
@@ -59,15 +60,17 @@ typedef enum {
 	NO_DIRECCION,
 } mrf24_state_t;
 
-/* Estructura con la lista de dispositivos cercanos --------------------------*/
+/* Estructura con la información del dispositivo */
 typedef struct {
 
-	uint8_t channel;
-	uint16_t panid;
-	uint8_t long_address[8];
-	uint16_t short_address;
-	uint8_t rssi;
-} MRF24_discover_nearby_t;
+	uint8_t sequence_number;
+	uint8_t my_channel;
+	uint8_t security_key[16];
+	uint8_t my_mac[8];
+	uint16_t my_panid;
+	uint16_t my_address;
+	uint16_t intervalo;
+}mrf24_data_config_t;
 
 /* Estructura con la información de transmisión ------------------------------*/
 typedef struct {
@@ -88,19 +91,29 @@ typedef struct {
 	char buffer[50];
 }mrf24_data_in_t;
 
+/* Estructura con la lista de dispositivos cercanos --------------------------*/
+typedef struct {
+
+	uint8_t channel;
+	uint16_t panid;
+	uint8_t long_address[8];
+	uint16_t short_address;
+	uint8_t rssi;
+} MRF24_discover_nearby_t;
+
+
 /* Prototipo de funciones públicas -------------------------------------------*/
 // Configuración del módulo
 mrf24_state_t MRF24J40Init(void);
-uint16_t MRF24GetMiPANID(void);
-uint16_t MRF24GetMyAddr(void);
+mrf24_data_config_t * MRF24GetConfig(void);
 
 // Mensajes salientes
-mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * info_out_s);
+mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s);
 
 // Mensajes entrantes
 volatile mrf24_state_t MRF24IsNewMsg(void);
 mrf24_state_t MRF24ReciboPaquete(void);
-mrf24_data_in_t * MRF24DataIn(void);
+mrf24_data_in_t * MRF24GetDataIn(void);
 
 //
 mrf24_state_t MRF24BuscarDispositivos(void);
