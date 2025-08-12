@@ -11,14 +11,16 @@
 #ifndef XC_HEADER_TEMPLATE_H
 #define	XC_HEADER_TEMPLATE_H
 
-enum { EADR0 = 0x05,
-       EADR1,
-       EADR2,
-       EADR3,
-       EADR4,
-       EADR5,
-       EADR6,
-       EADR7
+enum {
+
+	EADR0 = 0x05,
+	EADR1,
+	EADR2,
+	EADR3,
+	EADR4,
+	EADR5,
+	EADR6,
+	EADR7
 } long_mac_address_e;
 
 /* Direcciones de los registros de 8 bits ------------------------------------*/

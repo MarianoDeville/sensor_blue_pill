@@ -32,8 +32,8 @@ typedef enum {
 	ROJO
 } color_leds;
 
-void set_led(color_leds color, estado_leds_t estado);
-void toggle_led(color_leds color);
-estado_leds_t is_led(color_leds color);
+void SetLed(color_leds color, estado_leds_t estado);
+void ToggleLed(color_leds color);
+estado_leds_t IsLed(color_leds color);
 
 #endif /* INC_APP_LEDS_H_ */

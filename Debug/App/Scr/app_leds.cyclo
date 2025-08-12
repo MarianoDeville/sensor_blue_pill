@@ -1,3 +1,3 @@
-../App/Scr/app_leds.c:25:6:set_led	1
-../App/Scr/app_leds.c:35:6:toggle_led	1
-../App/Scr/app_leds.c:45:15:is_led	1
+../App/Scr/app_leds.c:25:6:SetLed	1
+../App/Scr/app_leds.c:35:6:ToggleLed	1
+../App/Scr/app_leds.c:45:15:IsLed	1

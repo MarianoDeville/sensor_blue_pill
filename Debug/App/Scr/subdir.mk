@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../App/Scr/app_config.c \
 ../App/Scr/app_debounce.c \
 ../App/Scr/app_delay_unlock.c \
 ../App/Scr/app_eeprom.c \
@@ -12,6 +13,7 @@ C_SRCS += \
 ../App/Scr/app_principal.c 
 
 OBJS += \
+./App/Scr/app_config.o \
 ./App/Scr/app_debounce.o \
 ./App/Scr/app_delay_unlock.o \
 ./App/Scr/app_eeprom.o \
@@ -19,6 +21,7 @@ OBJS += \
 ./App/Scr/app_principal.o 
 
 C_DEPS += \
+./App/Scr/app_config.d \
 ./App/Scr/app_debounce.d \
 ./App/Scr/app_delay_unlock.d \
 ./App/Scr/app_eeprom.d \
@@ -33,7 +36,7 @@ App/Scr/%.o App/Scr/%.su App/Scr/%.cyclo: ../App/Scr/%.c App/Scr/subdir.mk
 clean: clean-App-2f-Scr
 
 clean-App-2f-Scr:
-	-$(RM) ./App/Scr/app_debounce.cyclo ./App/Scr/app_debounce.d ./App/Scr/app_debounce.o ./App/Scr/app_debounce.su ./App/Scr/app_delay_unlock.cyclo ./App/Scr/app_delay_unlock.d ./App/Scr/app_delay_unlock.o ./App/Scr/app_delay_unlock.su ./App/Scr/app_eeprom.cyclo ./App/Scr/app_eeprom.d ./App/Scr/app_eeprom.o ./App/Scr/app_eeprom.su ./App/Scr/app_leds.cyclo ./App/Scr/app_leds.d ./App/Scr/app_leds.o ./App/Scr/app_leds.su ./App/Scr/app_principal.cyclo ./App/Scr/app_principal.d ./App/Scr/app_principal.o ./App/Scr/app_principal.su
+	-$(RM) ./App/Scr/app_config.cyclo ./App/Scr/app_config.d ./App/Scr/app_config.o ./App/Scr/app_config.su ./App/Scr/app_debounce.cyclo ./App/Scr/app_debounce.d ./App/Scr/app_debounce.o ./App/Scr/app_debounce.su ./App/Scr/app_delay_unlock.cyclo ./App/Scr/app_delay_unlock.d ./App/Scr/app_delay_unlock.o ./App/Scr/app_delay_unlock.su ./App/Scr/app_eeprom.cyclo ./App/Scr/app_eeprom.d ./App/Scr/app_eeprom.o ./App/Scr/app_eeprom.su ./App/Scr/app_leds.cyclo ./App/Scr/app_leds.d ./App/Scr/app_leds.o ./App/Scr/app_leds.su ./App/Scr/app_principal.cyclo ./App/Scr/app_principal.d ./App/Scr/app_principal.o ./App/Scr/app_principal.su
 
 .PHONY: clean-App-2f-Scr
 

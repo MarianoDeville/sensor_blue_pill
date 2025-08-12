@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "app_principal.h"
+#include "app_leds.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -253,7 +254,10 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-	  HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(LED_BOARD_GPIO_Port, LED_BOARD_Pin, LED_PRENDIDO);
+	  HAL_GPIO_WritePin(LED_VERDE_GPIO_Port, LED_VERDE_Pin, LED_APAGADO);
+	  HAL_GPIO_WritePin(LED_AMARILLO_GPIO_Port, LED_AMARILLO_Pin, LED_APAGADO);
+	  HAL_GPIO_WritePin(LED_ROJO_GPIO_Port, LED_ROJO_Pin, LED_APAGADO);
   }
   /* USER CODE END Error_Handler_Debug */
 }

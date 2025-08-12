@@ -15,10 +15,11 @@
 #include "app_eeprom.h"
 
 /**
- * @brief
- * @param
- * @param
- * @retval
+ * @brief  Copio desde memoria no volatil a memoria ram una estructura.
+ * @param  Dirección de memoria eeprom donde se encuentra la estructura.
+ * @param  Puntero a la estructura destino.
+ * @param  Tamaño de la estructura.
+ * @retval Estado de la operación (LOAD_OK, LOAD_ERR).
  * @note
  */
 eeprom_state_t EEPROMLoadStruct(eeprom_mem_t mem_addr,
@@ -32,10 +33,11 @@ eeprom_state_t EEPROMLoadStruct(eeprom_mem_t mem_addr,
 }
 
 /**
- * @brief
- * @param
- * @param
- * @retval
+ * @brief  Copio desde memoria ram a no volatil una estructura.
+ * @param  Dirección de memoria eeprom donde se encuentra la estructura.
+ * @param  Puntero a la estructura origen.
+ * @param  Tamaño de la estructura.
+ * @retval Estado de la operación (SAVE_OK, SAVE_ERR).
  * @note
  */
 eeprom_state_t EEPROMSaveStruct(eeprom_mem_t mem_addr,
@@ -53,7 +55,7 @@ eeprom_state_t EEPROMSaveStruct(eeprom_mem_t mem_addr,
     erase.PageAddress = page_start;
     erase.NbPages = 1;
 
-    if (HAL_FLASHEx_Erase(&erase, &pageError) != HAL_OK) {
+    if(HAL_FLASHEx_Erase(&erase, &pageError) != HAL_OK) {
 
         HAL_FLASH_Lock();
         __enable_irq();
@@ -66,7 +68,7 @@ eeprom_state_t EEPROMSaveStruct(eeprom_mem_t mem_addr,
     for(uint32_t i = 0; i < (struct_size + 3) / 4; i++) {
 
         status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, p_data[i]);
-        if (status != HAL_OK)
+        if(status != HAL_OK)
             break;
         address += 4;
     }

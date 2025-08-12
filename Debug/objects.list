@@ -1,3 +1,4 @@
+"./App/Scr/app_config.o"
 "./App/Scr/app_debounce.o"
 "./App/Scr/app_delay_unlock.o"
 "./App/Scr/app_eeprom.o"

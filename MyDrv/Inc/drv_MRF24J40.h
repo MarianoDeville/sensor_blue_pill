@@ -22,6 +22,7 @@
 #define SEC_KEY_SIZE	16
 #define WAIT_1_MS		1
 #define WAIT_50_MS		50
+#define BUFFER_SIZE		64
 
 /* Canales disponibles para el IEEE 802.15.4 ---------------------------------*/
 typedef enum {
@@ -48,50 +49,54 @@ typedef enum {
 /* Respuesta de las funciones ------------------------------------------------*/
 typedef enum {
 
-	INICIALIZACION_OK,
-	TRANSMISION_REALIZADA,
-	MSG_PRESENTE,
-	MSG_NO_PRESENTE,
-	MSG_LEIDO,
-	TIME_OUT_OCURRIDO,
-	OPERACION_NO_REALIZADA,
-	OPERACION_REALIZADA,
-	ERROR_INESPERADO,
-	NO_DIRECCION,
+	INITIALIZATION_FAIL,
+	INITIALIZATION_OK,
+	TRANSMISSION_COMPLETED,
+	DIRECTION_EMPTY,
+	MSG_PRESENT,
+	MSG_READ,
+	TO_LONG_MSG,
+	BUFFER_EMPTY,
+	TIME_OUT_OCURRED,
+	OPERATION_FAIL,
+	OPERATION_OK,
+	UNEXPECTED_ERROR,
+	INVALID_VALUE,
 } mrf24_state_t;
 
 /* Estructura con la información del dispositivo */
 typedef struct {
 
-	uint8_t sequence_number;
-	uint8_t my_channel;
-	uint8_t security_key[16];
-	uint8_t my_mac[8];
-	uint16_t my_panid;
+	channel_list_t my_channel;
+    uint16_t my_panid;
 	uint16_t my_address;
 	uint16_t intervalo;
+	uint8_t sequence_number;
+    uint8_t my_mac[8];
+	uint8_t security_key[16];
 }mrf24_data_config_t;
 
-/* Estructura con la información de transmisión ------------------------------*/
+/* Estructura con la información de transmisión */
 typedef struct {
 
 	uint16_t dest_panid;
 	uint16_t dest_address;
 	uint16_t origin_address;
-	char buffer[50];
+	char buffer[BUFFER_SIZE];
+	uint8_t buffer_size;
 }mrf24_data_out_t;
 
-/* Estructura con la información de recepción --------------------------------*/
+/* Estructura con la información de recepción */
 typedef struct {
 
 	uint16_t source_panid;
 	uint16_t source_address;
-	uint8_t tamano_mensaje;
 	uint8_t rssi;
-	char buffer[50];
+	uint8_t buffer[BUFFER_SIZE];
+	uint8_t buffer_size;
 }mrf24_data_in_t;
 
-/* Estructura con la lista de dispositivos cercanos --------------------------*/
+/* Estructura con la lista de dispositivos cercanos */
 typedef struct {
 
 	uint8_t channel;
@@ -106,6 +111,10 @@ typedef struct {
 // Configuración del módulo
 mrf24_state_t MRF24J40Init(void);
 mrf24_data_config_t * MRF24GetConfig(void);
+mrf24_state_t MRF24SetChannel(channel_list_t ch);
+mrf24_state_t MRF24SetPanId(uint16_t pan_id);
+mrf24_state_t MRF24SetAdd(uint16_t add);
+mrf24_state_t MRF24SetInter(uint16_t sec);
 
 // Mensajes salientes
 mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s);

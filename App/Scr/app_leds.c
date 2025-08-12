@@ -22,7 +22,7 @@ static info_leds_t led[3] = {{.puerto = LED_VERDE_GPIO_Port, .pin = LED_VERDE_Pi
  * @param   Valor a escribir.
  * @retval  None.
  */
-void set_led(color_leds color, estado_leds_t estado) {
+void SetLed(color_leds color, estado_leds_t estado) {
 
 	HAL_GPIO_WritePin(led[color].puerto, led[color].pin, estado);
 }
@@ -32,7 +32,7 @@ void set_led(color_leds color, estado_leds_t estado) {
  * @param   Led al que voy a escribir.
  * @retval  None.
  */
-void toggle_led(color_leds color) {
+void ToggleLed(color_leds color) {
 
 	HAL_GPIO_TogglePin(led[color].puerto, led[color].pin);
 }
@@ -42,7 +42,7 @@ void toggle_led(color_leds color) {
  * @param   Led al que voy a escribir.
  * @retval  Estado leído.
  */
-estado_leds_t is_led(color_leds color) {
+estado_leds_t IsLed(color_leds color) {
 
 	return HAL_GPIO_ReadPin(led[color].puerto, led[color].pin);
 }
