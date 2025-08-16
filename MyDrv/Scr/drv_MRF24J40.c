@@ -20,7 +20,7 @@
 /* Definiciones de la configuración por defecto ------------------------------*/
 #define	DEFAULT_CHANNEL		CH_11
 #define DEFAULT_SEC_NUMBER	(0X01)
-#define	MY_DEFAULT_PAN_ID	(0x1234)
+#define	MY_DEFAULT_PAN_ID	(0x9999)
 #define	MY_DEFAULT_ADDRESS	(0x1111)
 
 #define HEAD_LENGTH			(0X0B)
@@ -83,21 +83,19 @@ static void SetDeviceMACAddress(void);
  * @brief  Inicialización de variables de configuración por defecto.
  * @param  None
  * @retval None
+ * @note   Si no se inicializa previamente las variables se carga la configuración
+ * 		   por defecto.
  */
 static void InicializoVariables(void) {
 
-	if(VACIO == data_config_s.my_address || VACIO == data_config_s.my_panid) {
+	if(VACIO == data_config_s.channel) {
 
-		strncpy((char *)data_config_s.security_key,
-				(char *) default_security_key,
-				SEC_KEY_SIZE);
-		strncpy((char *)data_config_s.my_mac,
-				(char *) default_mac_address,
-				LARGE_MAC_SIZE);
+		memcpy(data_config_s.security_key, default_security_key, SEC_KEY_SIZE);
+		memcpy(data_config_s.mac, default_mac_address, LARGE_MAC_SIZE);
 		data_config_s.sequence_number = DEFAULT_SEC_NUMBER;
-		data_config_s.my_channel = DEFAULT_CHANNEL;
-		data_config_s.my_panid = MY_DEFAULT_PAN_ID;
-		data_config_s.my_address = MY_DEFAULT_ADDRESS;
+		data_config_s.channel = DEFAULT_CHANNEL;
+		data_config_s.panid = MY_DEFAULT_PAN_ID;
+		data_config_s.address = MY_DEFAULT_ADDRESS;
 	}
 	return;
 }
@@ -241,7 +239,7 @@ static uint8_t GetLongAddr(uint16_t reg_address) {
  */
 static void SetChannel(void) {
 
-	SetLongAddr(RFCON0, data_config_s.my_channel);
+	SetLongAddr(RFCON0, data_config_s.channel);
 	SetShortAddr(RFCTL, RFRST_HOLD);
 	SetShortAddr(RFCTL, VACIO);
 	delay_t(WAIT_1_MS);
@@ -255,10 +253,10 @@ static void SetChannel(void) {
  */
 static void SetDeviceAddress(void) {
 
-	SetShortAddr(SADRH, (uint8_t) (data_config_s.my_address >> SHIFT_BYTE));
-	SetShortAddr(SADRL, (uint8_t) (data_config_s.my_address));
-	SetShortAddr(PANIDH, (uint8_t) (data_config_s.my_panid >> SHIFT_BYTE));
-	SetShortAddr(PANIDL, (uint8_t) (data_config_s.my_panid));
+	SetShortAddr(SADRH, (uint8_t) (data_config_s.address >> SHIFT_BYTE));
+	SetShortAddr(SADRL, (uint8_t) (data_config_s.address));
+	SetShortAddr(PANIDH, (uint8_t) (data_config_s.panid >> SHIFT_BYTE));
+	SetShortAddr(PANIDL, (uint8_t) (data_config_s.panid));
 	return;
 }
 
@@ -271,7 +269,7 @@ static void SetDeviceMACAddress(void) {
 
 	for(uint8_t i = 0; i < LARGE_MAC_SIZE; i++) {
 
-		SetShortAddr(EADR0 + i, data_config_s.my_mac[i]);
+		SetShortAddr(EADR0 + i, data_config_s.mac[i]);
 	}
 	return;
 }
@@ -294,77 +292,107 @@ mrf24_state_t MRF24J40Init(void) {
 }
 
 /**
- * @brief   Devuelvo el puntero a la estructura que contiene la información de
- * 			configuración del módulo MRF24J40.
- * @param   None.
- * @retval  Puntero a la estructura tipo mrf24_data_config_t.
- */
-mrf24_data_config_t * MRF24GetConfig(void) {
-
-	return &data_config_s;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @brief
- * @param
- * @retval
+ * @brief	Actualizo el canal de trabajo.
+ * @param	Nuevo canal.
+ * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note	Se comprueba la integridad del dato.
  */
 mrf24_state_t MRF24SetChannel(channel_list_t ch) {
 
-	if(VACIO == ch)
+	if(0x03 > ch || 0xF3 < ch)
 		return INVALID_VALUE;
-	data_config_s.my_channel = ch;
+	data_config_s.channel = ch;
 	return OPERATION_OK;
 }
-//***********************************************************************************************************************************
+
 /**
- * @brief
- * @param
- * @retval
+ * @brief	Actualizo el PANID de trabajo.
+ * @param	Nuevo PANID (uint16_t).
+ * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note	Se comprueba la integridad del dato.
  */
 mrf24_state_t MRF24SetPanId(uint16_t pan_id) {
 
-	if(VACIO == pan_id)
+	if(BROADCAST == pan_id)
 		return INVALID_VALUE;
-	data_config_s.my_panid = pan_id;
+	data_config_s.panid = pan_id;
 	return OPERATION_OK;
 }
-//***********************************************************************************************************************************
+
 /**
- * @brief
- * @param
- * @retval
+ * @brief	Actualizo la dirección corta del dispositivo.
+ * @param	Nueva dirección (uint16_t).
+ * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note	Se comprueba la integridad del dato.
  */
 mrf24_state_t MRF24SetAdd(uint16_t add) {
 
-	if(VACIO == add)
+	if(BROADCAST == add)
 		return INVALID_VALUE;
-	data_config_s.my_address = add;
+	data_config_s.address = add;
 	return OPERATION_OK;
 }
-//***********************************************************************************************************************************
+
 /**
- * @brief
- * @param
- * @retval
+ * @brief	Actualizo el número de secuancia de las comunicaciones salientes.
+ * @param	Nuevo número de secuencia (uint16_t).
+ * @retval	Estado de la operación (OPERATION_OK).
  */
 mrf24_state_t MRF24SetInter(uint16_t sec) {
 
-
-
-
-	return INITIALIZATION_OK;
+	data_config_s.sequence_number = sec;
+	return OPERATION_OK;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief	Actualizo la dirección larga del dispositivo.
+ * @param	Nueva dirección (8 bytes).
+ * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note	Se comprueba la integridad del dato.
+ */
+mrf24_state_t MRF24SetMAC(uint8_t mac[8]) {
+
+	bool_t dif_cero = false;
+
+	for(uint8_t i =0; i < LARGE_MAC_SIZE; i++) {
+
+		if(VACIO != mac[i]) {
+
+			dif_cero = true;
+			break;
+		}
+	}
+
+	if(!dif_cero)
+		return INVALID_VALUE;
+	memcpy(data_config_s.mac, mac, sizeof(data_config_s.mac));
+	return OPERATION_OK;
+}
+
+/**
+ * @brief	Actualizo la llave de seguridad para la encriptación.
+ * @param	Nueva llave (16 bytes).
+ * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note	Se comprueba la integridad del dato.
+ */
+mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]) {
+
+	bool_t dif_cero = false;
+
+	for(uint8_t i =0; i < SEC_KEY_SIZE; i++) {
+
+		if(VACIO != security_key[i]) {
+
+			dif_cero = true;
+			break;
+		}
+	}
+
+	if(!dif_cero)
+		return INVALID_VALUE;
+	memcpy(data_config_s.security_key, security_key, sizeof(data_config_s.security_key));
+	return OPERATION_OK;
+}
 
 /**
  * @brief   Envío la información almacenada en la estructura de salida.
@@ -393,14 +421,14 @@ mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s) {
 	SetLongAddr(pos_mem++, data_config_s.sequence_number++);
 
 	if(VACIO == p_info_out_s->dest_panid)
-		p_info_out_s->dest_panid = data_config_s.my_panid;
+		p_info_out_s->dest_panid = data_config_s.panid;
 	SetLongAddr(pos_mem++, (uint8_t) p_info_out_s->dest_panid);
 	SetLongAddr(pos_mem++, (uint8_t) (p_info_out_s->dest_panid >> SHIFT_BYTE));
 	SetLongAddr(pos_mem++, (uint8_t) p_info_out_s->dest_address);
 	SetLongAddr(pos_mem++, (uint8_t) (p_info_out_s->dest_address >> SHIFT_BYTE));
 
 	if(VACIO == p_info_out_s->origin_address)
-		p_info_out_s->origin_address = data_config_s.my_address;
+		p_info_out_s->origin_address = data_config_s.address;
 	SetLongAddr(pos_mem++, (uint8_t) p_info_out_s->origin_address);
 	SetLongAddr(pos_mem++, (uint8_t) (p_info_out_s->origin_address >> SHIFT_BYTE));
 
@@ -455,7 +483,7 @@ mrf24_state_t MRF24ReciboPaquete(void) {
 	data_in_s.buffer_size = GetLongAddr(RX_FIFO);
 	uint16_t add = GetLongAddr(RX_FIFO + 9);
 	add = (add << SHIFT_BYTE) | GetLongAddr(RX_FIFO + 8);
-	data_in_s.source_address = add;
+	data_in_s.address = add;
 
 	for(uint8_t i = 0; i < data_in_s.buffer_size - FCS_LQI_RSSI; i++) {
 

@@ -17,6 +17,7 @@
 /* Respuesta de las funciones ------------------------------------------------*/
 typedef enum {
 
+	NO_SETUP,
 	CARGA_OK,
 	CARGA_ERR,
 	SETUP_FAIL,
@@ -24,7 +25,8 @@ typedef enum {
 }sys_state_t;
 
 /* Prototipo de funciones públicas -------------------------------------------*/
-sys_state_t CargarConfig(void);
 sys_state_t ModoSetup(void);
+sys_state_t CargarConfig(void);
+
 
 #endif /* INC_SETUP_H_ */

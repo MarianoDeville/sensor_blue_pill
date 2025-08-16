@@ -45,7 +45,6 @@ typedef enum {
 	CH_26 = 0xF3
 } channel_list_t;
 
-
 /* Respuesta de las funciones ------------------------------------------------*/
 typedef enum {
 
@@ -67,12 +66,12 @@ typedef enum {
 /* Estructura con la información del dispositivo */
 typedef struct {
 
-	channel_list_t my_channel;
-    uint16_t my_panid;
-	uint16_t my_address;
-	uint16_t intervalo;
+	channel_list_t channel;
 	uint8_t sequence_number;
-    uint8_t my_mac[8];
+    uint16_t panid;
+	uint16_t address;
+	uint16_t intervalo;
+    uint8_t mac[8];
 	uint8_t security_key[16];
 }mrf24_data_config_t;
 
@@ -89,8 +88,8 @@ typedef struct {
 /* Estructura con la información de recepción */
 typedef struct {
 
-	uint16_t source_panid;
-	uint16_t source_address;
+	uint16_t panid;
+	uint16_t address;
 	uint8_t rssi;
 	uint8_t buffer[BUFFER_SIZE];
 	uint8_t buffer_size;
@@ -106,15 +105,15 @@ typedef struct {
 	uint8_t rssi;
 } MRF24_discover_nearby_t;
 
-
 /* Prototipo de funciones públicas -------------------------------------------*/
 // Configuración del módulo
 mrf24_state_t MRF24J40Init(void);
-mrf24_data_config_t * MRF24GetConfig(void);
 mrf24_state_t MRF24SetChannel(channel_list_t ch);
 mrf24_state_t MRF24SetPanId(uint16_t pan_id);
 mrf24_state_t MRF24SetAdd(uint16_t add);
 mrf24_state_t MRF24SetInter(uint16_t sec);
+mrf24_state_t MRF24SetMAC(uint8_t mac[8]);
+mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]);
 
 // Mensajes salientes
 mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s);

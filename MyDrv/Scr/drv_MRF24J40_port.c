@@ -13,13 +13,16 @@
 #include "drv_MRF24J40_port.h"
 #include "../../App/Inc/compatibility.h"
 
+/* Variables públicas --------------------------------------------------------*/
 extern SPI_HandleTypeDef hspi1;
+
+/* Funciones públicas --------------------------------------------------------*/
 /**
  * @brief  Inicialización del hardware relacionado con el módulo
  * @param  None
  * @retval None
  */
-void InicializoPines(void){
+void InicializoPines(void) {
 
     SetCSPin(1);
     SetWakePin(1);
@@ -32,7 +35,7 @@ void InicializoPines(void){
  * @param  Estado de salida - booleano
  * @retval None
  */
-void SetCSPin(bool_t estado){
+void SetCSPin(bool_t estado) {
 
  	HAL_GPIO_WritePin(MRF24_CS_GPIO_Port, MRF24_CS_Pin, estado);
     return;
@@ -43,7 +46,7 @@ void SetCSPin(bool_t estado){
  * @param  Estado de salida - booleano
  * @retval None
  */
-void SetWakePin(bool_t estado){
+void SetWakePin(bool_t estado) {
 
  	HAL_GPIO_WritePin(MRF24_WAKE_GPIO_Port, MRF24_WAKE_Pin, estado);
     return;
@@ -54,7 +57,7 @@ void SetWakePin(bool_t estado){
  * @param  Estado de salida - booleano
  * @retval None
  */
-void SetResetPin(bool_t estado){
+void SetResetPin(bool_t estado) {
 
  	HAL_GPIO_WritePin(MRF24_RESET_GPIO_Port, MRF24_RESET_Pin, estado);
     return;
@@ -74,7 +77,7 @@ volatile bool_t IsMRF24Interrup(void) {
  * @param  Dato - 1 byte
  * @retval None
  */
-void WriteByteSPIPort(uint8_t dato){
+void WriteByteSPIPort(uint8_t dato) {
 
 	HAL_SPI_Transmit(&hspi1, &dato, _1_BYTE, TIME_OUT_SPI);
     return;
@@ -85,7 +88,7 @@ void WriteByteSPIPort(uint8_t dato){
  * @param  Dato - 1 byte
  * @retval None
  */
-void Write2ByteSPIPort(uint16_t dato){
+void Write2ByteSPIPort(uint16_t dato) {
 
 	uint8_t dato_partido = (uint8_t) (dato >> SHIFT_BYTE);
 	HAL_SPI_Transmit(&hspi1, &dato_partido, _1_BYTE, TIME_OUT_SPI);
@@ -99,7 +102,7 @@ void Write2ByteSPIPort(uint16_t dato){
  * @param  None
  * @retval Dato - 1 byte
  */
-uint8_t ReadByteSPIPort(void){
+uint8_t ReadByteSPIPort(void) {
 
 	uint8_t dato = 0x01;
 	HAL_SPI_Receive(&hspi1, &dato, _1_BYTE, TIME_OUT_SPI);

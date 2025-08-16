@@ -1,18 +1,20 @@
 /**
-******************************************************************************
+*******************************************************************************
  * @file    app_config.c
  * @author  Lcdo. Mariano Ariel Deville
  * @brief   Manejo del almacenado y carga de la configuración del sistema
- *******************************************************************************
- * @attention
- *
- *******************************************************************************
+ ******************************************************************************
+ * @attention En modo configuración la red carga la configuración por defecto.
+ *			  Si no se pulsa el botón para entrar en modo configuración se
+ *			  busca en la memória si existe una configuración guardada, si es
+ *			  así se recupera y se utiliza como configuración del módulo.
+ ******************************************************************************
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include <app_config.h>
+/* Includes -----------------------------------------------------------------*/
 #include <string.h>
 #include <stdio.h>
+#include "app_config.h"
 #include "app_principal.h"
 #include "drv_MRF24J40.h"
 #include "app_leds.h"
@@ -20,64 +22,34 @@
 #include "app_delay_unlock.h"
 #include "app_eeprom.h"
 
-/* Definiciones de la configuración por defecto ------------------------------*/
+/* Definiciones de la configuración por defecto -----------------------------*/
 #define SETUP_TIME_MS	5000
 #define CICLE_TIME_MS	500
 #define CICLE_TIME_OUT	24000
-#define CANT_PAR_MRF	5
+#define SIZE_COMMAND	7
 
-/* Variables privadas --------------------------------------------------------*/
-static 	system_config_t system_config_s = {0};
+/* Variables privadas -------------------------------------------------------*/
 
-/* Prototipo de funciones privadas -------------------------------------------*/
-static sys_state_t GetEEPROMtoMRF24Config(void);
 
-/* Funciones públicas --------------------------------------------------------*/
+/* Prototipo de funciones privadas ------------------------------------------*/
+static sys_state_t SetMRF24Config(mrf24_data_config_t * mrf_info_s);
+
+/* Funciones públicas -------------------------------------------------------*/
 /**
- * @brief  Recupero de la memoria no volatil la configuración de red y del sistema
- * @param  None.
- * @retval Estado de la carga (CARGA_OK, CARGA_ERR).
- * @note
- */
-sys_state_t CargarConfig(void) {
-
-	if(EEPROMLoadStruct(EEPROM_CONFIG_ADDR,
-						&system_config_s,
-						sizeof(system_config_t)) != LOAD_OK)
-		return CARGA_ERR;
-
-	if(GetEEPROMtoMRF24Config() != CARGA_OK)
-		return CARGA_ERR;
-
-	if(MRF24J40Init() != INITIALIZATION_OK)
-		return CARGA_ERR;
-	return CARGA_OK;
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @brief
- * @param
- * @param
- * @retval
- * @note
+ * @brief	Si en el arranque del módulo se presiona y mantiene presionado por
+ * 			10 segundos el botón de reset el módulo arranca en modo configuración
+ * @param	None.
+ * @retval	Estado de la operación (NO_SETUP, SETUP_FAIL y SETUP_SUCIFULL).
+ * @note	Arranco con la configuración de fábrica para el módulo MRF24J40
  */
 sys_state_t ModoSetup(void) {
 
 	int32_t tiempo = HAL_GetTick();
 	bool_t config_enable = false;
 
-	while(!HAL_GPIO_ReadPin(BTN_GPIO_Port, BTN_Pin)) {
+	while(HAL_GPIO_ReadPin(BTN_GPIO_Port, BTN_Pin)) {
 
 		if((HAL_GetTick() - tiempo) >= SETUP_TIME_MS) {
-
-			config_enable = true;
 
 			for(uint8_t i = 0; i < 6; i++) {
 
@@ -85,13 +57,24 @@ sys_state_t ModoSetup(void) {
 				ToggleLed(VERDE);
 				delay_t(500);
 			}
+			config_enable = true;
 			break;
 		}
 	}
+
+	if(!config_enable)
+		return NO_SETUP;
+
+	if(INITIALIZATION_OK != MRF24J40Init())			// inicializo el mrf con configuración por defecto
+		return SETUP_FAIL;
 	uint8_t ciclos = 0;
 	delayNoBloqueanteData_t delay_time;
 	DelayInit(&delay_time, CICLE_TIME_MS);
-	mrf24_data_in_t * mrf24_data_in;
+	mrf24_data_in_t * mrf24_data_in;				// puntero para recibir el mensage de entrada
+	mrf24_data_config_t data_config_recibida = {0}; // variable de configuración recibida para el mrf
+	system_config_t  system_data_recibida = {0};	// variable de configuración recibida para el systema
+	bool_t actualizar_mrf24 = false;
+	bool_t actualizar_system_info = false;
 
 	while(config_enable) {
 
@@ -104,129 +87,127 @@ sys_state_t ModoSetup(void) {
 		if(ciclos > CICLE_TIME_OUT)
 			return SETUP_FAIL;
 
-		// Acá recibo por IEEE 802.15.2 la configuración del sistema y de la red
-		//
-		if(MRF24IsNewMsg() == MSG_PRESENT) {
+		if(MSG_PRESENT == MRF24IsNewMsg()) {
 
-			if(MRF24ReciboPaquete() == MSG_READ) {
+			if(MSG_READ == MRF24ReciboPaquete()) {
 
 				mrf24_data_in = MRF24GetDataIn();
-				char *palabra = strtok((char *)mrf24_data_in->buffer, ":");
 
-/**
- * mejor recibo una estructura, la primer parte del mensaje me dice que estructura recibo
- * Comandos a recibir:
- * 						MRFCNF:CH(1 BYTE),PANID(2 BYTE),ADDRESS(2 BYTE),INTERVALO(2 BYTE)
- * 						MACCNF:LONG MAC ADDRESS (8 BYTES)
- * 						SECCNF:SECURITY KEY (16 BYTES)
- * 						DESIG:PLAYA,ZONA,BOX,PISO
- * Puedo mandar datos binarios en cambio de ascii, por ejemplo MRFCNF puede ser 0xFF0100
- * 	FF: comando
- * 	01: número de comando
- *	0: cantidad de variables a enviar (máximo 16)
- *	0: (bit menos significativo) tamaño de las variables en bytes (máximo 4 bytes)
- *
- *	0xFF0281: sería como enviar MACCNF con 8 datos de un byte y así sucesivamente.
- *
- * Para envío de datos sería 0xF00001
- *
- */
-				if(!strcmp(palabra, "MRFCNF")) {
+				if(!memcmp(mrf24_data_in->buffer, "MRFCNF:", SIZE_COMMAND)) {
 
-// Acá leo cada parámetro y lo guardo
-// descarto la primer parte del mensaje porque es el comando y nesecito solo la parte de la estructura
+					memcpy(&data_config_recibida,
+							mrf24_data_in->buffer + SIZE_COMMAND,
+							mrf24_data_in->buffer_size - SIZE_COMMAND);
+					actualizar_mrf24 = true;
+				} else if(!memcmp(mrf24_data_in->buffer, "SYSCNF:", SIZE_COMMAND)) {
 
-					mrf24_data_config_t data_config_recibida = {0};
+					memcpy(&system_data_recibida,
+							mrf24_data_in->buffer + SIZE_COMMAND,
+							mrf24_data_in->buffer_size - SIZE_COMMAND);
+					actualizar_system_info = true;
+				} else if(!memcmp(mrf24_data_in->buffer, "ENDCNF:", SIZE_COMMAND)) {
 
-					uint8_t tamaño = strlen("MRFCNF:");
-
-					memcpy(&data_config_recibida, mrf24_data_in->buffer + tamaño, mrf24_data_in->buffer_size - tamaño);
-
-					data_config_recibida.intervalo = 4;
-
+					config_enable = false;
 				}
-
-
 			}
-
-
 		}
-		//
-		// Después de de terminar de recibirla bajo la bandera
-
-
-
-
 	}
 
+	if(actualizar_mrf24) {
 
-	return SETUP_SUCIFULL;
+		if(CARGA_OK != SetMRF24Config(&data_config_recibida))
+			return SETUP_FAIL;
 
-
-
-	// Inicializo la red con la nueva configuración y el sistema
-	// Cargo de la memoria no volatil la configuración del sistema.
-	if(EEPROMLoadStruct(EEPROM_CONFIG_ADDR,
-						&system_config_s,
-						sizeof(system_config_t)) != LOAD_OK)
-		return SETUP_FAIL;
-
-	// Cargo de la memoria no volatil la configuración de red e inicializo el módulo.
-	if(GetEEPROMtoMRF24Config() != CARGA_OK)
-		return SETUP_FAIL;
-
-	if(MRF24J40Init() != INITIALIZATION_OK)
-		return SETUP_FAIL;
-
+		if(SAVE_OK != EEPROMSaveStruct(EEPROM_MRF24_ADDR, &data_config_recibida, sizeof(mrf24_data_config_t)))
+			return SETUP_FAIL;
+	}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if(actualizar_system_info) {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// chequeo que los datos estén bien y guardo en la rom
+	}
+	// si todo va bien envío un mensaje avisando que se configuró correctamente el dispositivo.
+    mrf24_data_out_t data_out_s;
+	data_out_s.dest_address = BROADCAST;
+	data_out_s.dest_panid = 0x9999;
+	data_out_s.origin_address = 0x1111;
+    data_out_s.buffer_size = strlen("Configuración guardada");
+	strcpy(data_out_s.buffer, "Configuración guardada");
+	MRF24TransmitirDato(&data_out_s);
 
 	for(uint8_t i = 0; i < 6; i++) {
 
 		ToggleLed(VERDE);
 		delay_t(500);
 	}
-
-
-
 	return SETUP_SUCIFULL;
 }
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Funciones privadas --------------------------------------------------------*/
 /**
- * @brief	Recupero de la memoria no volatil la configuración de red.
+ * @brief	Recupero de la memoria no volatil la configuración de red y del
+ * 			sistema si estan almacenadas en ROM.
  * @param	None.
- * @retval	None.
+ * @retval	Estado de la carga (CARGA_OK, CARGA_ERR).
  * @note
  */
-static sys_state_t GetEEPROMtoMRF24Config(void) {
+sys_state_t CargarConfig(void) {
 
-	mrf24_data_config_t mrf24_config_s;
-	if(EEPROMLoadStruct(EEPROM_MRF24_ADDR, &mrf24_config_s, sizeof(mrf24_config_s)) == LOAD_OK) {
+	mrf24_data_config_t * mrf24_config_s;
+	if(LOAD_OK == EEPROMLoadStruct(EEPROM_MRF24_ADDR, &mrf24_config_s, sizeof(mrf24_data_config_t))) {
 
-		if(mrf24_config_s.my_channel != 0xFF)
-			memcpy(MRF24GetConfig(), &mrf24_config_s, sizeof(mrf24_config_s));
-	} else {
+		if(0xFF == mrf24_config_s->channel)
+			return CARGA_ERR;
 
-		return CARGA_ERR;
+		if(CARGA_ERR == SetMRF24Config(mrf24_config_s))
+			return CARGA_ERR;
 	}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	system_config_t * system_config_s;
+
+	if(LOAD_OK != EEPROMLoadStruct(EEPROM_CONFIG_ADDR, &system_config_s, sizeof(system_config_t)))
+			return CARGA_ERR;
+
+
+
+
+
+	if(INITIALIZATION_OK != MRF24J40Init())
+		return CARGA_ERR;
 	return CARGA_OK;
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/* Funciones privadas -------------------------------------------------------*/
+/**
+ * @brief	Actualizo la información de configuración en el driver MRF24J40
+ * @param	Puntero a la estructura con la información
+ * @retval	Estado de la operación (CARGA_OK, CARGA_ERR).
+ * @note	Si alguno de los parámetros no son correctos se informa el error
+ * 			para no continuar con el arranque.
+ */
+sys_state_t SetMRF24Config(mrf24_data_config_t * mrf_info_s) {
+
+	if(OPERATION_OK != MRF24SetChannel(mrf_info_s->channel))
+		return CARGA_ERR;
+
+	if(OPERATION_OK != MRF24SetPanId(mrf_info_s->panid))
+		return CARGA_ERR;
+
+	if(OPERATION_OK != MRF24SetAdd(mrf_info_s->address))
+		return CARGA_ERR;
+
+	if(OPERATION_OK != MRF24SetInter(mrf_info_s->intervalo))
+		return CARGA_ERR;
+
+	if(OPERATION_OK != MRF24SetMAC(mrf_info_s->mac))
+		return CARGA_ERR;
+
+	if(OPERATION_OK != MRF24SetSecurityKey(mrf_info_s->security_key))
+		return CARGA_ERR;
+	return CARGA_OK;
+}
+
