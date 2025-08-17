@@ -32,38 +32,7 @@ void bucle(void) {
 	SetLed(VERDE, LED_APAGADO);
 	SetLed(AMARILLO, LED_APAGADO);
 	SetLed(ROJO, LED_APAGADO);
-/*
-mrf24_data_config_t data_guardo = {0};
-mrf24_data_config_t data_recupero = {0};
 
-data_guardo.channel = CH_11;
-data_guardo.panid = 0x1234;
-data_guardo.address = LOW_END_ADDR;//(0x1111)
-data_guardo.intervalo = 0x58f7;
-data_guardo.sequence_number = 99;
-memcpy(data_guardo.mac, "12345678", 8);
-memcpy(data_guardo.security_key, "1234568523467819", 16);
-
-EEPROMSaveStruct(EEPROM_MRF24_ADDR, &data_guardo, sizeof(mrf24_data_config_t));
-HAL_Delay(250);
-
-system_config_t guardo_config = {0};
-system_config_t recupero_config = {0};
-
-strcpy(guardo_config.box, "3");
-strcpy(guardo_config.piso, "1ro");
-strcpy(guardo_config.sector, "Naranja");
-strcpy(guardo_config.playa, "La playita");
-
-EEPROMLoadStruct(EEPROM_MRF24_ADDR, &data_recupero, sizeof(mrf24_data_config_t));
-HAL_Delay(250);
-
-EEPROMSaveStruct(EEPROM_CONFIG_ADDR, &guardo_config, sizeof(system_config_t));
-HAL_Delay(250);
-
-EEPROMLoadStruct(EEPROM_CONFIG_ADDR, &recupero_config, sizeof(system_config_t));
-HAL_Delay(250);
-*/
 	if(SETUP_FAIL == ModoSetup())
 		Error_Handler();
 

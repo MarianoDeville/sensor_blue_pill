@@ -27,6 +27,9 @@ typedef enum {
 /* Prototipo de funciones públicas -------------------------------------------*/
 sys_state_t ModoSetup(void);
 sys_state_t CargarConfig(void);
-
+char * GetNombrePlaya(void);
+char * GetSectorPlaya(void);
+char * GetBoxPlaya(void);
+char * GetPisoPlaya(void);
 
 #endif /* INC_SETUP_H_ */

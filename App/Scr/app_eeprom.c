@@ -99,7 +99,7 @@ eeprom_state_t EEPROMSaveStruct(eeprom_mem_t mem_addr,
     __enable_irq();
 	eeprom_data_t verify = {0};
 	memcpy(&verify, (const void*)page_start, sizeof(verify));
-	if(HAL_OK != status || !memcmp(&verify, &bloque_actual, sizeof(verify)))
+	if(HAL_OK != status || memcmp(&verify, &bloque_actual, sizeof(verify)))
 		return SAVE_ERR;
     return SAVE_OK;
 }

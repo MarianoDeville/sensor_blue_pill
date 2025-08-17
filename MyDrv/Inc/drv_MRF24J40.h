@@ -22,7 +22,7 @@
 #define SEC_KEY_SIZE	16
 #define WAIT_1_MS		1
 #define WAIT_50_MS		50
-#define BUFFER_SIZE		64
+#define BUFFER_SIZE		128
 
 /* Canales disponibles para el IEEE 802.15.4 ---------------------------------*/
 typedef enum {

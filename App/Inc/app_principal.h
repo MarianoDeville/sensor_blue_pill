@@ -23,8 +23,6 @@ typedef struct {
 	char piso[10];
 }system_config_t;
 
-
 void bucle(void);
-
 
 #endif /* INC_APP_PRINCIPAL_H_ */
