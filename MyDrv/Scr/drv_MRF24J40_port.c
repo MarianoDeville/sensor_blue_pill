@@ -69,7 +69,7 @@ void SetResetPin(bool_t estado) {
  */
 volatile bool_t IsMRF24Interrup(void) {
 
-	return HAL_GPIO_ReadPin(MRF24_INTERRUP_GPIO_Port, MRF24_INTERRUP_Pin);
+	return HAL_GPIO_ReadPin(MRF24_INT_GPIO_Port, MRF24_INT_Pin);
 }
 
 /**

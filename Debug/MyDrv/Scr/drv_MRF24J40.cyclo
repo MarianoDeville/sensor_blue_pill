@@ -18,4 +18,4 @@
 ../MyDrv/Scr/drv_MRF24J40.c:450:24:MRF24IsNewMsg	3
 ../MyDrv/Scr/drv_MRF24J40.c:466:15:MRF24ReciboPaquete	3
 ../MyDrv/Scr/drv_MRF24J40.c:503:19:MRF24GetDataIn	1
-../MyDrv/Scr/drv_MRF24J40.c:513:15:MRF24BuscarDispositivos	2
+../MyDrv/Scr/drv_MRF24J40.c:515:15:MRF24BuscarDispositivos	2

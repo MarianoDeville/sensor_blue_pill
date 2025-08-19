@@ -67,6 +67,7 @@ void bucle(void) {
 
 /**
   * @brief  Manejo de las pulsaciones del botón
+  * @param	None.
   * @retval
   */
 static void CheckBoton(void) {

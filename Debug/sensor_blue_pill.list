@@ -39,13 +39,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   0000c999  00000000  00000000  00028b5e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00083980  00000000  00000000  000354f7  2**0
+ 18 .debug_str    00083976  00000000  00000000  000354f7  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000b8e77  2**0
+ 19 .comment      00000043  00000000  00000000  000b8e6d  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000021d8  00000000  00000000  000b8ebc  2**2
+ 20 .debug_frame  000021d8  00000000  00000000  000b8eb0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000059  00000000  00000000  000bb094  2**0
+ 21 .debug_line_str 00000059  00000000  00000000  000bb088  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1484,9 +1484,9 @@ void bucle(void) {
  80009ec:	080035cc 	.word	0x080035cc
 
 080009f0 <CheckBoton>:
-
 /**
   * @brief  Manejo de las pulsaciones del botón
+  * @param	None.
   * @retval
   */
 static void CheckBoton(void) {
@@ -1955,8 +1955,8 @@ static void MX_GPIO_Init(void)
  8000c9a:	480d      	ldr	r0, [pc, #52]	@ (8000cd0 <MX_GPIO_Init+0x13c>)
  8000c9c:	f000 fc7a 	bl	8001594 <HAL_GPIO_Init>
 
-  /*Configure GPIO pin : MRF24_INTERRUP_Pin */
-  GPIO_InitStruct.Pin = MRF24_INTERRUP_Pin;
+  /*Configure GPIO pin : MRF24_INT_Pin */
+  GPIO_InitStruct.Pin = MRF24_INT_Pin;
  8000ca0:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
  8000ca4:	613b      	str	r3, [r7, #16]
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -1965,7 +1965,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
  8000caa:	2300      	movs	r3, #0
  8000cac:	61bb      	str	r3, [r7, #24]
-  HAL_GPIO_Init(MRF24_INTERRUP_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(MRF24_INT_GPIO_Port, &GPIO_InitStruct);
  8000cae:	f107 0310 	add.w	r3, r7, #16
  8000cb2:	4619      	mov	r1, r3
  8000cb4:	4806      	ldr	r0, [pc, #24]	@ (8000cd0 <MX_GPIO_Init+0x13c>)
@@ -9163,7 +9163,7 @@ volatile bool_t IsMRF24Interrup(void) {
  8003438:	b580      	push	{r7, lr}
  800343a:	af00      	add	r7, sp, #0
 
-	return HAL_GPIO_ReadPin(MRF24_INTERRUP_GPIO_Port, MRF24_INTERRUP_Pin);
+	return HAL_GPIO_ReadPin(MRF24_INT_GPIO_Port, MRF24_INT_Pin);
  800343c:	f44f 5180 	mov.w	r1, #4096	@ 0x1000
  8003440:	4805      	ldr	r0, [pc, #20]	@ (8003458 <IsMRF24Interrup+0x20>)
  8003442:	f7fe fa2b 	bl	800189c <HAL_GPIO_ReadPin>

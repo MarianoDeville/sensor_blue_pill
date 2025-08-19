@@ -510,6 +510,8 @@ mrf24_data_in_t * MRF24GetDataIn(void) {
 
 
 
+
+
 mrf24_state_t MRF24BuscarDispositivos(void) {
 
 //   static MRF24_discover_nearby_t algo[10];

@@ -73,8 +73,8 @@ void Error_Handler(void);
 #define MRF24_RESET_GPIO_Port GPIOA
 #define MRF24_WAKE_Pin GPIO_PIN_11
 #define MRF24_WAKE_GPIO_Port GPIOA
-#define MRF24_INTERRUP_Pin GPIO_PIN_12
-#define MRF24_INTERRUP_GPIO_Port GPIOA
+#define MRF24_INT_Pin GPIO_PIN_12
+#define MRF24_INT_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
