@@ -1,0 +1,2 @@
+../App/Scr/app_eeprom.c:36:16:EEPROMSaveStruct	14
+../App/Scr/app_eeprom.c:115:16:EEPROMLoadStruct	5

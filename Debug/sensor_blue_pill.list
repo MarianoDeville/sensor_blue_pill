@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  00005024  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00007fa0  00000000  00000000  0000504d  2**0
+ 12 .debug_info   00007fa5  00000000  00000000  0000504d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000023d0  00000000  00000000  0000cfed  2**0
+ 13 .debug_abbrev 000023e5  00000000  00000000  0000cff2  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000928  00000000  00000000  0000f3c0  2**3
+ 14 .debug_aranges 00000928  00000000  00000000  0000f3d8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 000006af  00000000  00000000  0000fce8  2**0
+ 15 .debug_rnglists 000006af  00000000  00000000  0000fd00  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000187c7  00000000  00000000  00010397  2**0
+ 16 .debug_macro  000187c7  00000000  00000000  000103af  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000c999  00000000  00000000  00028b5e  2**0
+ 17 .debug_line   0000c999  00000000  00000000  00028b76  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00083976  00000000  00000000  000354f7  2**0
+ 18 .debug_str    00083974  00000000  00000000  0003550f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000b8e6d  2**0
+ 19 .comment      00000043  00000000  00000000  000b8e83  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000021d8  00000000  00000000  000b8eb0  2**2
+ 20 .debug_frame  000021d8  00000000  00000000  000b8ec8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000059  00000000  00000000  000bb088  2**0
+ 21 .debug_line_str 00000059  00000000  00000000  000bb0a0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -565,11 +565,11 @@ sys_state_t SetMRF24Config(mrf24_data_config_t * mrf_info_s) {
  800048c:	2302      	movs	r3, #2
  800048e:	e01e      	b.n	80004ce <SetMRF24Config+0x82>
 
-	if(OPERATION_OK != MRF24SetInter(mrf_info_s->intervalo))
+	if(OPERATION_OK != MRF24SetSec(mrf_info_s->intervalo))
  8000490:	687b      	ldr	r3, [r7, #4]
  8000492:	88db      	ldrh	r3, [r3, #6]
  8000494:	4618      	mov	r0, r3
- 8000496:	f002 fdc5 	bl	8003024 <MRF24SetInter>
+ 8000496:	f002 fdc5 	bl	8003024 <MRF24SetSec>
  800049a:	4603      	mov	r3, r0
  800049c:	2b0a      	cmp	r3, #10
  800049e:	d001      	beq.n	80004a4 <SetMRF24Config+0x58>
@@ -7860,8 +7860,8 @@ static void InicializoVariables(void) {
  8002c6c:	08003608 	.word	0x08003608
 
 08002c70 <InicializoMRF24>:
-/**
  * @brief  Inicialización del módulo MRF24J40MA
+ *
  * @param  None
  * @retval Estado de la operación (TIME_OUT_OCURRIDO, INICIALIZACION_OK)
  */
@@ -8201,8 +8201,8 @@ static uint8_t GetLongAddr(uint16_t reg_address) {
 	...
 
 08002ea4 <SetChannel>:
-/**
  * @brief  Seteo en el módulo en canal guardado en mrf24_data_config
+ *
  * @param  None
  * @retval None
  */
@@ -8234,8 +8234,8 @@ static void SetChannel(void) {
  8002ed0:	20000114 	.word	0x20000114
 
 08002ed4 <SetDeviceAddress>:
-/**
  * @brief  Seteo en el módulo la dirección corta guardada en mrf24_data_config
+ *
  * @param  None
  * @retval None
  */
@@ -8282,8 +8282,8 @@ static void SetDeviceAddress(void) {
  8002f1c:	20000114 	.word	0x20000114
 
 08002f20 <SetDeviceMACAddress>:
-/**
  * @brief  Seteo en el módulo la dirección mac guardada en mrf24_data_config.
+ *
  * @param  None.
  * @retval None.
  */
@@ -8326,11 +8326,9 @@ static void SetDeviceMACAddress(void) {
  8002f58:	20000114 	.word	0x20000114
 
 08002f5c <MRF24J40Init>:
-/**
- * @brief  Inicialización del módulo MRF24J40MA.
- * @param  None.
- * @retval Estado de la operación (TIME_OUT_OCURRIDO, INICIALIZACION_OK).
- */
+
+/* Funciones públicas --------------------------------------------------------*/
+
 mrf24_state_t MRF24J40Init(void) {
  8002f5c:	b580      	push	{r7, lr}
  8002f5e:	af00      	add	r7, sp, #0
@@ -8364,11 +8362,7 @@ mrf24_state_t MRF24J40Init(void) {
  8002f90:	20000110 	.word	0x20000110
 
 08002f94 <MRF24SetChannel>:
- * @brief	Actualizo el canal de trabajo.
- * @param	Nuevo canal.
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
+
 mrf24_state_t MRF24SetChannel(channel_list_t ch) {
  8002f94:	b480      	push	{r7}
  8002f96:	b083      	sub	sp, #12
@@ -8401,11 +8395,7 @@ mrf24_state_t MRF24SetChannel(channel_list_t ch) {
  8002fc0:	20000114 	.word	0x20000114
 
 08002fc4 <MRF24SetPanId>:
- * @brief	Actualizo el PANID de trabajo.
- * @param	Nuevo PANID (uint16_t).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
+
 mrf24_state_t MRF24SetPanId(uint16_t pan_id) {
  8002fc4:	b480      	push	{r7}
  8002fc6:	b083      	sub	sp, #12
@@ -8437,11 +8427,7 @@ mrf24_state_t MRF24SetPanId(uint16_t pan_id) {
  8002ff0:	20000114 	.word	0x20000114
 
 08002ff4 <MRF24SetAdd>:
- * @brief	Actualizo la dirección corta del dispositivo.
- * @param	Nueva dirección (uint16_t).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
+
 mrf24_state_t MRF24SetAdd(uint16_t add) {
  8002ff4:	b480      	push	{r7}
  8002ff6:	b083      	sub	sp, #12
@@ -8472,13 +8458,9 @@ mrf24_state_t MRF24SetAdd(uint16_t add) {
  800301e:	bf00      	nop
  8003020:	20000114 	.word	0x20000114
 
-08003024 <MRF24SetInter>:
-/**
- * @brief	Actualizo el número de secuancia de las comunicaciones salientes.
- * @param	Nuevo número de secuencia (uint16_t).
- * @retval	Estado de la operación (OPERATION_OK).
- */
-mrf24_state_t MRF24SetInter(uint16_t sec) {
+08003024 <MRF24SetSec>:
+
+mrf24_state_t MRF24SetSec(uint16_t sec) {
  8003024:	b480      	push	{r7}
  8003026:	b083      	sub	sp, #12
  8003028:	af00      	add	r7, sp, #0
@@ -8488,7 +8470,7 @@ mrf24_state_t MRF24SetInter(uint16_t sec) {
 	data_config_s.sequence_number = sec;
  800302e:	88fb      	ldrh	r3, [r7, #6]
  8003030:	b2da      	uxtb	r2, r3
- 8003032:	4b04      	ldr	r3, [pc, #16]	@ (8003044 <MRF24SetInter+0x20>)
+ 8003032:	4b04      	ldr	r3, [pc, #16]	@ (8003044 <MRF24SetSec+0x20>)
  8003034:	705a      	strb	r2, [r3, #1]
 	return OPERATION_OK;
  8003036:	230a      	movs	r3, #10
@@ -8502,11 +8484,7 @@ mrf24_state_t MRF24SetInter(uint16_t sec) {
  8003044:	20000114 	.word	0x20000114
 
 08003048 <MRF24SetMAC>:
- * @brief	Actualizo la dirección larga del dispositivo.
- * @param	Nueva dirección (8 bytes).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
+
 mrf24_state_t MRF24SetMAC(uint8_t mac[8]) {
  8003048:	b480      	push	{r7}
  800304a:	b085      	sub	sp, #20
@@ -8572,11 +8550,7 @@ mrf24_state_t MRF24SetMAC(uint8_t mac[8]) {
  80030a0:	20000114 	.word	0x20000114
 
 080030a4 <MRF24SetSecurityKey>:
- * @brief	Actualizo la llave de seguridad para la encriptación.
- * @param	Nueva llave (16 bytes).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
+
 mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]) {
  80030a4:	b490      	push	{r4, r7}
  80030a6:	b084      	sub	sp, #16
@@ -8645,11 +8619,7 @@ mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]) {
  8003104:	20000114 	.word	0x20000114
 
 08003108 <MRF24TransmitirDato>:
- * @brief   Envío la información almacenada en la estructura de salida.
- * @param   None.
- * @retval  Estado de la operación (OPERACION_NO_REALIZADA,
- * 			TRANSMISION_REALIZADA, NO_DIRECCION, MSG_NO_PRESENTE).
- */
+
 mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s) {
  8003108:	b580      	push	{r7, lr}
  800310a:	b084      	sub	sp, #16
@@ -8886,11 +8856,7 @@ mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s) {
  80032b4:	20000114 	.word	0x20000114
 
 080032b8 <MRF24IsNewMsg>:
- * @brief   Se levantó la bandera indicando la llegada de un mensaje.
- * @param   None.
- * @retval  Estado de la operación (ERROR_INESPERADO, MSG_PRESENTE,
- *          MSG_NO_PRESENTE).
- */
+
 volatile mrf24_state_t MRF24IsNewMsg(void) {
  80032b8:	b580      	push	{r7, lr}
  80032ba:	af00      	add	r7, sp, #0
@@ -8923,11 +8889,7 @@ volatile mrf24_state_t MRF24IsNewMsg(void) {
  80032e4:	20000110 	.word	0x20000110
 
 080032e8 <MRF24ReciboPaquete>:
- * @brief   Recibir un paquete y dejarlo en el bufer de entrada en
- *          la estructura data_in_s.
- * @param   None.
- * @retval  Estado de la operación (OPERACION_NO_REALIZADA, MSG_LEIDO).
- */
+
 mrf24_state_t MRF24ReciboPaquete(void) {
  80032e8:	b590      	push	{r4, r7, lr}
  80032ea:	b083      	sub	sp, #12
@@ -9028,11 +8990,7 @@ mrf24_state_t MRF24ReciboPaquete(void) {
  8003398:	20000134 	.word	0x20000134
 
 0800339c <MRF24GetDataIn>:
- * @brief   Devuelvo el puntero a la estructura que contiene la información del
- * 			mensaje de entrada.
- * @param   None.
- * @retval  Puntero a la estructura tipo mrf24_data_in_t.
- */
+
 mrf24_data_in_t * MRF24GetDataIn(void) {
  800339c:	b480      	push	{r7}
  800339e:	af00      	add	r7, sp, #0

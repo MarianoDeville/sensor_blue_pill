@@ -3,9 +3,8 @@
  * @file    drv_MRF24J40.c
  * @author  Lcdo. Mariano Ariel Deville
  * @brief   Implementación driver módulo MRF24J40
- *******************************************************************************
- * @attention Driver independiente de la plataforma de uso y del compilardor.
- *
+ * @version 0.1
+ * @date 2025/02/01
  *******************************************************************************
  */
 
@@ -17,21 +16,28 @@
 #include "drv_MRF24J40_port.h"
 #include "app_delay_unlock.h"
 
-/* Definiciones de la configuración por defecto ------------------------------*/
-#define	DEFAULT_CHANNEL		CH_11
-#define DEFAULT_SEC_NUMBER	(0X01)
-#define	MY_DEFAULT_PAN_ID	(0x9999)
-#define	MY_DEFAULT_ADDRESS	(0xFFFE)
+/* Macros --------------------------------------------------------------------*/
+#define MRF_TIME_OUT    200
+#define WAIT_1_MS       1
+#define WAIT_50_MS      50
+#define ENABLE          true
+#define	DISABLE         false
 
-#define HEAD_LENGTH			(0X0B)
-#define WRITE_16_BITS		(0X8010)
-#define READ_16_BITS		(0X8000)
-#define WRITE_8_BITS		(0x01)
-#define READ_8_BITS			(0x7E)
-#define SHIFT_LONG_ADDR		(0X05)
-#define SHIFT_SHORT_ADDR	(0X01)
-#define SHIFT_BYTE			(0X08)
-#define FCS_LQI_RSSI		(0x04)
+/* Definiciones de la configuración por defecto ------------------------------*/
+#define	DEFAULT_CHANNEL     CH_11
+#define DEFAULT_SEC_NUMBER  (0X01)
+#define	MY_DEFAULT_PAN_ID   (0x9999)
+#define	MY_DEFAULT_ADDRESS  (0xFFFE)
+
+#define HEAD_LENGTH         (0X0B)
+#define WRITE_16_BITS       (0X8010)
+#define READ_16_BITS        (0X8000)
+#define WRITE_8_BITS        (0x01)
+#define READ_8_BITS         (0x7E)
+#define SHIFT_LONG_ADDR     (0X05)
+#define SHIFT_SHORT_ADDR    (0X01)
+#define SHIFT_BYTE          (0X08)
+#define FCS_LQI_RSSI        (0x04)
 
 /* Variables privadas --------------------------------------------------------*/
 static mrf24_state_t estadoActual = INITIALIZATION_FAIL;
@@ -80,11 +86,12 @@ static void SetDeviceMACAddress(void);
 
 /* Funciones privadas --------------------------------------------------------*/
 /**
- * @brief  Inicialización de variables de configuración por defecto.
- * @param  None
- * @retval None
+ * @brief  Inicialización de variables de configuración.
+ *
+ * @param  None.
+ * @return None.
  * @note   Si no se inicializa previamente las variables se carga la configuración
- * 		   por defecto.
+ * 		   por defecto de fábrica.
  */
 static void InicializoVariables(void) {
 
@@ -101,9 +108,10 @@ static void InicializoVariables(void) {
 }
 
 /**
- * @brief  Inicialización del módulo MRF24J40MA
- * @param  None
- * @retval Estado de la operación (TIME_OUT_OCURRIDO, INICIALIZACION_OK)
+ * @brief  Inicialización del módulo MRF24J40MA.
+ *
+ * @param  None.
+ * @return mrf24_state_t Estado de la operación (TIME_OUT_OCURRIDO, INICIALIZACION_OK).
  */
 static mrf24_state_t InicializoMRF24(void) {
 
@@ -144,7 +152,7 @@ static mrf24_state_t InicializoMRF24(void) {
 			return TIME_OUT_OCURRED;
 	}while(RX != lectura);
 	SetShortAddr(MRFINTCON, SLPIE_DIS | WAKEIE_DIS | HSYMTMRIE_DIS | SECIE_DIS
-					| TXG2IE_DIS | TXNIE_DIS);
+                 | TXG2IE_DIS | TXNIE_DIS);
 	SetShortAddr(ACKTMOUT, DRPACK | MAWD5 | MAWD4 | MAWD3 | MAWD0);
 	SetChannel();
 	SetShortAddr(RXMCR, VACIO);
@@ -153,10 +161,12 @@ static mrf24_state_t InicializoMRF24(void) {
 }
 
 /**
- * @brief  Escribo en registro de 1 byte un dato de 1 byte
- * @param  Dirección del registro - 1 byte
- * @param  Dato - 1 byte
- * @retval None
+ * @brief  Escribo en módulo MRF24J40 mediante SPI un registro de 1 byte y un
+ *         dato de 1 byte.
+ *
+ * @param  uint8_t Dirección del registro.
+ * @param  uint8_t Dato.
+ * @return None.
  * @note   Al escribir direcciones cortas (SHORT ADDRESS REGISTER) se comienza
  *         con el MSB en 0 indicando una dirección corta, 6 bits con la
  *         dirección del registro, y 1 bit indicando la lectura o escritura.
@@ -173,9 +183,10 @@ static void SetShortAddr(uint8_t reg_address, uint8_t valor) {
 
 /**
  * @brief  Leo en registro de 1 byte un dato de 1 byte
+ *
  * @param  Dirección del registro - 1 byte
  * @param  Dato - 1 byte
- * @retval Valor devuelto por el módulo - 1 byte
+ * @return uint8_t Valor devuelto por el módulo.
  * @note   Al escribir direcciones cortas (SHORT ADDRESS REGISTER) se comienza
  *         con el MSB en 0 indicando una dirección corta, 6 bits con la
  *         dirección del registro, y 1 bit indicando la lectura o escritura.
@@ -193,9 +204,10 @@ static uint8_t GetShortAddr(uint8_t reg_address) {
 
 /**
  * @brief  Escribo de en registro de 2 bytes un dato de 1 byte
+ *
  * @param  Dirección del registro - 2 bytes
  * @param  Dato - 1 byte
- * @retval None
+ * @return None
  * @note   Al escribir direcciones largas (LONG ADDRESS REGISTER) se comienza
  *         con el MSB en 1 indicando una dirección larga, 10 bits con la
  *         dirección del registro, y 1 bit indicando la lectura o escritura. En
@@ -213,9 +225,10 @@ static void SetLongAddr(uint16_t reg_address, uint8_t valor) {
 
 /**
  * @brief  Leo en registro de 2 bytes un dato de 1 byte
+ *
  * @param  Dirección del registro - 2 bytes
  * @param  Dato - 1 byte
- * @retval Valor devuelto por el módulo - 1 byte
+ * @return Valor devuelto por el módulo - 1 byte
  * @note   Al escribir direcciones largas (LONG ADDRESS REGISTER) se comienza
  *         con el MSB en 1 indicando una dirección larga, 10 bits con la
  *         dirección del registro, y 1 bit indicando la lectura o escritura. En
@@ -234,8 +247,9 @@ static uint8_t GetLongAddr(uint16_t reg_address) {
 
 /**
  * @brief  Seteo en el módulo en canal guardado en mrf24_data_config
+ *
  * @param  None
- * @retval None
+ * @return None
  */
 static void SetChannel(void) {
 
@@ -248,8 +262,9 @@ static void SetChannel(void) {
 
 /**
  * @brief  Seteo en el módulo la dirección corta guardada en mrf24_data_config
+ *
  * @param  None
- * @retval None
+ * @return None
  */
 static void SetDeviceAddress(void) {
 
@@ -262,8 +277,9 @@ static void SetDeviceAddress(void) {
 
 /**
  * @brief  Seteo en el módulo la dirección mac guardada en mrf24_data_config.
+ *
  * @param  None.
- * @retval None.
+ * @return None.
  */
 static void SetDeviceMACAddress(void) {
 
@@ -275,11 +291,7 @@ static void SetDeviceMACAddress(void) {
 }
 
 /* Funciones públicas --------------------------------------------------------*/
-/**
- * @brief  Inicialización del módulo MRF24J40MA.
- * @param  None.
- * @retval Estado de la operación (TIME_OUT_OCURRIDO, INICIALIZACION_OK).
- */
+
 mrf24_state_t MRF24J40Init(void) {
 
 	InicializoVariables();
@@ -291,12 +303,6 @@ mrf24_state_t MRF24J40Init(void) {
 	return estadoActual;
 }
 
-/**
- * @brief	Actualizo el canal de trabajo.
- * @param	Nuevo canal.
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
 mrf24_state_t MRF24SetChannel(channel_list_t ch) {
 
 	if(0x03 > ch || 0xF3 < ch)
@@ -305,12 +311,6 @@ mrf24_state_t MRF24SetChannel(channel_list_t ch) {
 	return OPERATION_OK;
 }
 
-/**
- * @brief	Actualizo el PANID de trabajo.
- * @param	Nuevo PANID (uint16_t).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
 mrf24_state_t MRF24SetPanId(uint16_t pan_id) {
 
 	if(BROADCAST == pan_id)
@@ -319,12 +319,6 @@ mrf24_state_t MRF24SetPanId(uint16_t pan_id) {
 	return OPERATION_OK;
 }
 
-/**
- * @brief	Actualizo la dirección corta del dispositivo.
- * @param	Nueva dirección (uint16_t).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
 mrf24_state_t MRF24SetAdd(uint16_t add) {
 
 	if(BROADCAST == add)
@@ -333,23 +327,12 @@ mrf24_state_t MRF24SetAdd(uint16_t add) {
 	return OPERATION_OK;
 }
 
-/**
- * @brief	Actualizo el número de secuancia de las comunicaciones salientes.
- * @param	Nuevo número de secuencia (uint16_t).
- * @retval	Estado de la operación (OPERATION_OK).
- */
-mrf24_state_t MRF24SetInter(uint16_t sec) {
+mrf24_state_t MRF24SetSec(uint16_t sec) {
 
 	data_config_s.sequence_number = sec;
 	return OPERATION_OK;
 }
 
-/**
- * @brief	Actualizo la dirección larga del dispositivo.
- * @param	Nueva dirección (8 bytes).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
 mrf24_state_t MRF24SetMAC(uint8_t mac[8]) {
 
 	bool_t dif_cero = false;
@@ -369,12 +352,6 @@ mrf24_state_t MRF24SetMAC(uint8_t mac[8]) {
 	return OPERATION_OK;
 }
 
-/**
- * @brief	Actualizo la llave de seguridad para la encriptación.
- * @param	Nueva llave (16 bytes).
- * @retval	Estado de la operación (INVALID_VALUE, OPERATION_OK).
- * @note	Se comprueba la integridad del dato.
- */
 mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]) {
 
 	bool_t dif_cero = false;
@@ -394,12 +371,6 @@ mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]) {
 	return OPERATION_OK;
 }
 
-/**
- * @brief   Envío la información almacenada en la estructura de salida.
- * @param   None.
- * @retval  Estado de la operación (OPERACION_NO_REALIZADA,
- * 			TRANSMISION_REALIZADA, NO_DIRECCION, MSG_NO_PRESENTE).
- */
 mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s) {
 
 	if(INITIALIZATION_OK != estadoActual)
@@ -441,12 +412,6 @@ mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s) {
 	return TRANSMISSION_COMPLETED;
 }
 
-/**
- * @brief   Se levantó la bandera indicando la llegada de un mensaje.
- * @param   None.
- * @retval  Estado de la operación (ERROR_INESPERADO, MSG_PRESENTE,
- *          MSG_NO_PRESENTE).
- */
 volatile mrf24_state_t MRF24IsNewMsg(void) {
 
 	if(INITIALIZATION_OK != estadoActual)
@@ -457,12 +422,6 @@ volatile mrf24_state_t MRF24IsNewMsg(void) {
 	return BUFFER_EMPTY;
 }
 
-/**
- * @brief   Recibir un paquete y dejarlo en el bufer de entrada en
- *          la estructura data_in_s.
- * @param   None.
- * @retval  Estado de la operación (OPERACION_NO_REALIZADA, MSG_LEIDO).
- */
 mrf24_state_t MRF24ReciboPaquete(void) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -494,12 +453,6 @@ mrf24_state_t MRF24ReciboPaquete(void) {
 	return MSG_READ;
 }
 
-/**
- * @brief   Devuelvo el puntero a la estructura que contiene la información del
- * 			mensaje de entrada.
- * @param   None.
- * @retval  Puntero a la estructura tipo mrf24_data_in_t.
- */
 mrf24_data_in_t * MRF24GetDataIn(void) {
 
 	return &data_in_s;

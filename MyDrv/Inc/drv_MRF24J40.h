@@ -3,9 +3,8 @@
  * @file    drv_MRF24J40.h
  * @author  Lcdo. Mariano Ariel Deville
  * @brief	Archivo cabecera para el archivo drv_MRF24J40.c
- *******************************************************************************
- * @attention Driver independiente de la plataforma de uso y del compilardor.
- *
+ * @version 0.1
+ * @date 2025/02/01
  *******************************************************************************
  */
 #ifndef INC_DRV_MRF24J40_H_
@@ -15,13 +14,8 @@
 
 /* Macros --------------------------------------------------------------------*/
 #define	BROADCAST		(0xFFFF)
-#define MRF_TIME_OUT	200
-#define ENABLE			true
-#define	DISABLE			false
 #define LARGE_MAC_SIZE	8
 #define SEC_KEY_SIZE	16
-#define WAIT_1_MS		1
-#define WAIT_50_MS		50
 #define BUFFER_SIZE		128
 
 /* Canales disponibles para el IEEE 802.15.4 ---------------------------------*/
@@ -63,7 +57,7 @@ typedef enum {
 	INVALID_VALUE,
 } mrf24_state_t;
 
-/* Estructura con la información del dispositivo */
+/* Estructura con la información de configuración del dispositivo */
 typedef struct {
 
 	channel_list_t channel;
@@ -106,24 +100,111 @@ typedef struct {
 } MRF24_discover_nearby_t;
 
 /* Prototipo de funciones públicas -------------------------------------------*/
-// Configuración del módulo
+
+/**
+ * @brief  Inicialización del módulo MRF24J40MA.
+ *
+ * @param  None.
+ * @return mrf24_state_t Estado de la operación (TIME_OUT_OCURRIDO, INICIALIZACION_OK).
+ */
 mrf24_state_t MRF24J40Init(void);
+
+/**
+ * @brief  Actualizo el canal de trabajo.
+ *
+ * @param  channel_list_t Nuevo canal.
+ * @return mrf24_state_t Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note   Se comprueba la integridad del dato.
+ */
 mrf24_state_t MRF24SetChannel(channel_list_t ch);
+
+/**
+ * @brief  Actualizo el PANID de trabajo.
+ *
+ * @param  uint16_t Nuevo PANID (uint16_t).
+ * @return mrf24_state_t Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note   Se comprueba la integridad del dato.
+ */
 mrf24_state_t MRF24SetPanId(uint16_t pan_id);
+
+/**
+ * @brief  Actualizo la dirección corta del dispositivo.
+ *
+ * @param  uint16_t Nueva dirección (uint16_t).
+ * @return mrf24_state_t Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note   Se comprueba la integridad del dato.
+ */
 mrf24_state_t MRF24SetAdd(uint16_t add);
-mrf24_state_t MRF24SetInter(uint16_t sec);
+
+/**
+ * @brief  Actualizo el número de secuancia de las comunicaciones salientes.
+ *
+ * @param  Nuevo número de secuencia (uint16_t).
+ * @return mrf24_state_t Estado de la operación (OPERATION_OK).
+ */
+mrf24_state_t MRF24SetSec(uint16_t sec);
+
+/**
+ * @brief  Actualizo la dirección larga del dispositivo.
+ *
+ * @param  uint8_t Nueva dirección (8 bytes).
+ * @return mrf24_state_t Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note   Se comprueba la integridad del dato.
+ */
 mrf24_state_t MRF24SetMAC(uint8_t mac[8]);
+
+/**
+ * @brief  Actualizo la llave de seguridad para la encriptación.
+ *
+ * @param  uint8_t Nueva llave (16 bytes).
+ * @return mrf24_state_t Estado de la operación (INVALID_VALUE, OPERATION_OK).
+ * @note   Se comprueba la integridad del dato.
+ */
 mrf24_state_t MRF24SetSecurityKey(uint8_t security_key[16]);
 
-// Mensajes salientes
+
+/**
+ * @brief  Envío la información almacenada en la estructura de salida.
+ *
+ * @param  mrf24_data_out_t * Puntero a la estructura que contiene la información
+ *                            de envío.
+ * @return mrf24_state_t Estado de la operación (OPERACION_NO_REALIZADA,
+ *         TRANSMISION_REALIZADA, NO_DIRECCION, MSG_NO_PRESENTE).
+ */
 mrf24_state_t MRF24TransmitirDato(mrf24_data_out_t * p_info_out_s);
 
-// Mensajes entrantes
+
+/**
+ * @brief  Se levantó la bandera indicando la llegada de un mensaje?
+ *
+ * @param  None.
+ * @return mrf24_state_t Estado de la operación (ERROR_INESPERADO, MSG_PRESENTE,
+ *         MSG_NO_PRESENTE).
+ */
 volatile mrf24_state_t MRF24IsNewMsg(void);
+
+/**
+ * @brief  Recibir un paquete y dejarlo en el bufer de entrada en la estructura
+ *         data_in_s.
+ *
+ * @param  None.
+ * @return mrf24_state_t Estado de la operación (OPERACION_NO_REALIZADA, MSG_LEIDO).
+ */
 mrf24_state_t MRF24ReciboPaquete(void);
+
+/**
+ * @brief  Devuelvo el puntero a la estructura que contiene la información del
+ *         mensaje de entrada.
+ *
+ * @param  None.
+ * @return mrf24_data_in_t * Puntero a la estructura donde se almacena el mensaje
+ *                           de llegada junto con la información del mismo.
+ */
 mrf24_data_in_t * MRF24GetDataIn(void);
 
-//
+
+
+
 mrf24_state_t MRF24BuscarDispositivos(void);
 mrf24_state_t MRF24TransmitirDatoEncriptado(void);
 

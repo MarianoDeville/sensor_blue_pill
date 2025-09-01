@@ -239,7 +239,7 @@ sys_state_t SetMRF24Config(mrf24_data_config_t * mrf_info_s) {
 	if(OPERATION_OK != MRF24SetAdd(mrf_info_s->address))
 		return CARGA_ERR;
 
-	if(OPERATION_OK != MRF24SetInter(mrf_info_s->intervalo))
+	if(OPERATION_OK != MRF24SetSec(mrf_info_s->intervalo))
 		return CARGA_ERR;
 
 	if(OPERATION_OK != MRF24SetMAC(mrf_info_s->mac))

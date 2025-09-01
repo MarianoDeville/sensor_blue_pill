@@ -1,0 +1,7 @@
+../App/Scr/app_config.c:45:13:ModoSetup	20
+../App/Scr/app_config.c:158:8:GetNombrePlaya	1
+../App/Scr/app_config.c:169:8:GetSectorPlaya	1
+../App/Scr/app_config.c:180:8:GetBoxPlaya	1
+../App/Scr/app_config.c:191:8:GetPisoPlaya	1
+../App/Scr/app_config.c:203:13:CargarConfig	6
+../App/Scr/app_config.c:231:13:SetMRF24Config	7
